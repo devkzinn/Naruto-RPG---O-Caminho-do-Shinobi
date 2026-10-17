@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Naruto RPG – Caminho do Shinobi</title>
+<style>
+:root{--bg:#fbf4e8;--cd:#fff;--tx:#2a2118;--mu:#7a6a58;--ac:#e8590c;--bd:#e3d5bf;--hp:#e03131;--ck:#1c7ed6;--lv:#d6336c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15110d;--cd:#211b15;--tx:#f1e8da;--mu:#a8987f;--bd:#3a3026}}
+:root[data-theme="dark"]{--bg:#15110d;--cd:#211b15;--tx:#f1e8da;--mu:#a8987f;--bd:#3a3026}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:14px}
+h1{font-size:24px;margin:8px 0}h3,h4{margin:10px 0 6px}h4{color:var(--mu);font-size:13px;letter-spacing:.05em}
+.c{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:12px;margin:10px 0}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.b{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;cursor:pointer;text-align:left}
+.b:hover{border-color:var(--ac)}.b small{display:block;color:var(--mu);font-size:12px}
+.p{background:var(--ac);color:#fff;border-color:var(--ac);text-align:center;font-weight:600}
+.lock{opacity:.55}
+input[type=text],input[type=number]{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px;width:100%}
+.br{position:relative;height:18px;background:var(--bg);border:1px solid var(--bd);border-radius:9px;margin:4px 0;overflow:hidden;font-size:12px}
+.br i{position:absolute;left:0;top:0;bottom:0;opacity:.45}.br span{position:relative;padding-left:8px}
+#log{height:240px;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:8px 12px}
+#log p{margin:5px 0}.sys{color:var(--mu);font-style:italic}.ok{color:#2f9e44;font-weight:600}.bad{color:var(--hp)}.bt{font-weight:600}
+.rk{display:inline-block;min-width:22px;text-align:center;border-radius:6px;color:#fff;font-weight:700;padding:0 5px;margin-right:6px}
+.rkD{background:#868e96}.rkC{background:#2f9e44}.rkB{background:#1c7ed6}.rkA{background:#7048e8}.rkS{background:#c92a2a}
+.el label{display:block;border:1px solid var(--bd);border-radius:10px;padding:8px;cursor:pointer}
+.el input{margin-right:6px}[hidden]{display:none!important}
+.row{display:flex;gap:8px;margin-top:8px}
+</style></head><body><main>
+<section id="cr">
+<h1>🍥 Naruto RPG: Caminho do Shinobi</h1>
+<div class="c"><p>Crie seu shinobi e viva livremente em Konoha: converse, treine, duele, faça amizades, enfrente missões de rank D a S e derrote chefes lendários.</p>
+<h4>Nome</h4><input type="text" id="nm" maxlength="20" placeholder="Seu nome ninja">
+<h4>Idade</h4><input type="number" id="ag" min="6" max="40" value="12">
+<h4>Elemento</h4><div class="g el" id="els"></div>
+<div class="row"><button class="b p" style="flex:1" onclick="start()">Iniciar jornada</button><button class="b" id="ct" onclick="cont()" hidden>Continuar</button></div></div>
+</section>
+<section id="gm" hidden>
+<div class="c" id="st"></div>
+<div id="log"></div>
+<div class="c" id="pn"></div>
+<div class="row"><button class="b" onclick="newg()">Novo jogo</button></div>
+</section>
+</main>
+<script>
+/* ================= 1. UTILIDADES ================= */
+const $=s=>document.querySelector(s),R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a,P=a=>a[R(0,a.length-1)];
+const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const btn=(l,f,c='')=>`<button class="b ${c}" onclick="${f}">${l}</button>`;
+const bar=(l,v,m,c)=>`<div class="br"><span>${l} ${Math.round(v)}/${m}</span><i style="width:${Math.max(0,Math.min(100,v/m*100))}%;background:var(--${c})"></i></div>`;
+const rkb=r=>`<span class="rk rk${r}">${r}</span>`;
+
+/* ================= 2. DADOS ================= */
+const RK=['Estudante da Academia','Genin','Chunin','Jounin'],TM=['Manhã','Tarde','Noite'];
+const ST=['nin','tai','vel','int'],AT=[...ST,'car'];   // atributos de combate / todos (car = carisma)
+const E={fogo:['Fogo','🔥','vento',['Katon: Goukakyuu','Katon: Housenka','Katon: Haisekishou']],
+agua:['Água','💧','fogo',['Suiton: Suiryuudan','Suiton: Mizu Teppou','Suiton: Daibakufu']],
+vento:['Vento','🌪️','relampago',['Fuuton: Daitoppa','Fuuton: Kazekiri','Fuuton: Shinkuugyoku']],
+terra:['Terra','⛰️','agua',['Doton: Doryuuheki','Doton: Doryuudan','Doton: Doryuu Taiga']],
+relampago:['Relâmpago','⚡','terra',['Raiton: Denkou','Raiton: Nagashi','Raiton: Chidori']]};
+// NPC: [nome, emoji, título, falas, [hp, ataque, elemento], [bônus do conselho, texto]]
+const N={
+iruka:['Iruka','🍥','Instrutor da Academia',['“Todo grande ninja começou aprendendo. Continue firme!”','“Força sem coração não faz um shinobi.”','“Minha porta está sempre aberta para quem quer estudar.”'],[70,9,''],['int','Iruka revisa suas táticas e você aprende muito sobre estratégia.']],
+konohamaru:['Konohamaru','🧣','Neto do Terceiro',['“Um dia serei Hokage, tá ligado?!”','“Quer me ajudar a pregar uma peça? Hehe!”','“O chefe Naruto é meu rival… e meu ídolo!”'],[40,5,''],['vel','Konohamaru mostra um atalho secreto e treina sua velocidade.']],
+teuchi:['Teuchi','🍜','Dono do Ichiraku',['“Ramen fresquinho! A casa é sua, shinobi.”','“Ninja de barriga cheia luta melhor, é a minha lei!”','“O Naruto já devorou umas mil tigelas aqui.”'],[50,4,''],['mh','Teuchi serve o ramen especial e sua vitalidade aumenta!']],
+naruto:['Naruto Uzumaki','🍥','Shinobi hiperativo',['“Eu vou ser Hokage, dattebayo!”','“Ei, vamos treinar? Nunca desisto!”','“Ramen é a melhor coisa do mundo!”'],[90,11,'vento'],['vel','Naruto ensina um truque com clones e você ganha agilidade.']],
+lee:['Rock Lee','💚','Mestre do taijutsu',['“A juventude floresce! Vamos treinar até cair!”','“Trabalho duro supera o talento!”','“Se não fizer 500 flexões, farei 1000!”'],[80,12,''],['tai','Lee divide seus pesos de treino e seus golpes ficam mais fortes.']],
+sasuke:['Sasuke Uchiha','⚡','Prodígio solitário',['“…Não me atrapalhe.”','“Poder é o que importa. Treine mais.”','“Hmph. Você não é tão fraco assim.”'],[85,13,'relampago'],['nin','Sasuke corrige sua forma de moldar chakra.']],
+sakura:['Sakura Haruno','🌸','Ninja médica',['“Cuide bem de si mesmo, ouviu?”','“Controle de chakra é tudo!”','“Se ficar ferido, venha ao hospital.”'],[75,12,''],['mh','Sakura ensina um pouco de ninjutsu médico e seu corpo resiste mais.']],
+neji:['Neji Hyuuga','👁️','Gênio do Clã Hyuuga',['“Destino… é algo que podemos mudar.”','“Meus olhos veem tudo ao redor.”','“Não subestime ninguém.”'],[85,12,''],['vel','Neji mostra como ler o movimento do oponente.']],
+kakashi:['Kakashi Hatake','📖','Ninja Copiador',['“Cheguei atrasado… havia um gato preto.”','“Quem quebra regras é lixo, quem abandona amigos é pior.”','“Hm? Estava lendo. Não é da sua conta.”'],[120,16,'relampago'],['nin','Kakashi demonstra um selo de mão raro e seu ninjutsu evolui.']],
+tsunade:['Tsunade','👑','Quinta Hokage',['“Quer uma missão? Tenho muitas pendentes.”','“A vila é minha prioridade, mocinho(a).”','“Não me faça perder a paciência.”'],[140,18,''],['mh','Tsunade transfere um pouco de chakra e sua vida aumenta.']],
+shizune:['Shizune','🐷','Assistente da Hokage',['“Papelada, papelada… sempre papelada!”','“Não deixe a Lady Tsunade beber demais.”','“Seja gentil com os pacientes.”'],[60,8,''],['int','Shizune ensina a identificar venenos.']],
+jiraiya:['Jiraiya','🐸','Sennin Sapo',['“Eu sou o grande Jiraiya, o ermitão!”','“Pesquisa de campo, claro. Pesquisa!”','“Shinobi de verdade protege o futuro.”'],[130,17,'fogo'],['nin','Jiraiya compartilha um segredo de chakra natural.']],
+hinata:['Hinata Hyuuga','💜','Gentil kunoichi',['“Ah… o-olá…”','“Eu também quero ficar mais forte.”','“Naruto me inspira todos os dias.”'],[75,10,''],['tai','Hinata ensina o Punho Gentil básico.']],
+anko:['Anko Mitarashi','🍡','Examinadora ousada',['“Quer sobreviver? Então não grite!”','“Dango é vida, garoto(a).”','“Na Floresta da Morte só vencem os cruéis.”'],[90,13,''],['tai','Anko ensina uma emboscada com kunai.']],
+kurenai:['Kurenai Yuhi','🌹','Mestra de genjutsu',['“Um bom ninja enxerga além da ilusão.”','“Calma e controle: é isso que separa a técnica do caos.”','“Os alunos de hoje são os guardiões de amanhã.”'],[110,15,''],['int','Kurenai mostra como quebrar um genjutsu.']]};
+// Locais e quem pode aparecer neles
+const L={academia:['🏫','Academia Ninja',['iruka','konohamaru']],ichiraku:['🍜','Ichiraku Ramen',['teuchi','naruto','hinata']],treino:['🥋','Campo de Treinamento',['lee','sasuke','sakura','neji','kakashi','kurenai']],torre:['🏯','Torre do Hokage',['tsunade','shizune','jiraiya']],hospital:['🏥','Hospital de Konoha',['sakura','shizune','hinata']],mercado:['🏮','Mercado',['hinata','konohamaru','anko','jiraiya','kurenai']],floresta:['🌲','Floresta de Konoha',['anko','neji','naruto']]};
+// Romance: SOMENTE personagens adultos e jogador com 18+. [presente favorito, resposta positiva, resposta negativa]
+const RM={iruka:['livro','“Você é atencioso(a)… isso me deixa sem jeito.”','“Sou seu professor, lembra? Vamos com calma.”'],
+kakashi:['livro','“Maa, maa… você tem coragem. Gosto disso.”','“Hm, talvez em outra hora. Estou lendo.”'],
+tsunade:['cha','“Heh, ousado(a). Poucos têm essa audácia comigo.”','“Cuidado, ou o próximo soco é de verdade.”'],
+shizune:['flor','“Ah! V-você acha mesmo?… Obrigada, fico feliz.”','“Desculpe, estou cheia de papelada agora…”'],
+anko:['dango','“Ousado(a)… gosto disso. Continue.”','“Hmph, vai com calma, novato(a).”'],
+kurenai:['flor','“Que gentileza… você sabe mesmo conquistar alguém.”','“Hoje não. Preciso manter o foco.”']};
+const G={flor:['🌹 Flores',25],dango:['🍡 Dango',15],livro:['📖 Livro',30],cha:['🍵 Chá fino',20]};
+const DT=[['Passear pela vila ao entardecer','vel'],['Conversar sob as estrelas','car'],['Dividir uma tigela no Ichiraku','int']];
+// Inimigos: [nome, hp, ataque, elemento, chefe?]
+const EN={ladrao:['Ladrão de Estrada',40,7,''],lobo:['Lobo Selvagem',36,8,''],renegado:['Ninja Renegado',70,11,'fogo'],bandidos:['Líder dos Bandidos',80,12,''],kiri:['Espadachim Renegado',120,16,'agua'],akat:['Ninja de Capa Negra',200,22,'terra'],
+zabuza:['Zabuza Momochi, Demônio da Névoa',230,19,'agua',1],oro:['Orochimaru, o Sannin Serpente',340,24,'terra',1],kisame:['Kisame Hoshigaki, Monstro da Névoa',480,28,'agua',1],pain:['Pain, o Deus que Desce',640,34,'vento',1]};
+// Missões: [rank, nome, descrição, inimigo final, ryo, xp]
+const MS=[['D','Capturar o gato Tora','A esposa do Daimyo perdeu o gato… de novo.','ladrao',60,25],
+['D','Capinar o jardim da vila','Um serviço simples, mas algo se mexe nos arbustos.','lobo',45,20],
+['C','Escoltar o construtor Tazuna','Bandidos cercam a estrada para a Vila da Onda.','bandidos',150,50],
+['C','Caçar o ninja renegado','Um renegado foi visto perto da fronteira.','renegado',180,60],
+['B','Infiltrar a base do Espadachim','Vá em silêncio. Se falhar, a vila não ajudará.','kiri',350,120],
+['B','Duelo na Ponte da Névoa','Zabuza empunha sua espada gigante sob a neblina.','zabuza',500,180],
+['A','Enfrentar a ameaça da Capa Negra','Uma organização misteriosa avança sobre a vila.','akat',700,250],
+['A','Cobra na Floresta da Morte','Orochimaru espreita durante o exame. Há vidas em jogo.','oro',950,330],
+['S','A Sombra de Kisame','Um membro da Akatsuki foi visto perto de Konoha.','kisame',1400,450],
+['S','A Invasão de Pain','Konoha está sob ataque. Só você pode detê-lo.','pain',2600,800]];
+const NEED={D:1,C:1,B:2,A:3,S:3},LVN={D:1,C:3,B:6,A:10,S:15},MSK='DCBAS';
+const STP=[['Uma ponte quebrada bloqueia o caminho.',[['Saltar com agilidade','vel'],['Criar passagem com chakra','nin'],['Procurar outro caminho','int']]],
+['Rastros recentes na lama sugerem perigo.',[['Seguir os rastros','int'],['Vigiar do alto de uma árvore','vel'],['Avançar na força','tai']]],
+['Um viajante suspeito pede ajuda.',[['Interrogar com firmeza','tai'],['Ler suas intenções','int'],['Usar um genjutsu leve','nin']]],
+['Fios e kunai: uma armadilha!',[['Desviar','vel'],['Desarmar com cuidado','int'],['Resistir ao golpe','tai']]],
+['Uma tempestade de areia dificulta a visão.',[['Cobrir o rosto e avançar','tai'],['Orientar-se pelo vento','int'],['Dissipar com chakra','nin']]],
+['Aldeões desconfiados barram a passagem.',[['Persuadir com educação','car'],['Mostrar a testa protetora','int'],['Intimidar','tai']]],
+['Um mensageiro ferido cai à sua frente.',[['Prestar socorro','int'],['Carregar até a vila','tai'],['Convencê-lo a falar','car']]],
+['Névoa densa esconde inimigos.',[['Sentir o chakra ao redor','nin'],['Mover-se em silêncio','vel'],['Esperar e observar','int']]]];
+const EXR=[{lv:2,dn:0,loc:'academia',nm:'🎓 Exame de graduação'},{lv:6,dn:3,mm:10,loc:'torre',nm:'🏅 Exame Chunin'},{lv:12,dn:8,el:2,loc:'torre',nm:'🥇 Exame Jounin'}];
+// Exames em fases (índice = rank atual). quiz = perguntas, chk = provas de atributo, fight = lutas em sequência
+const EXS=[0,[
+{n:'1ª Fase · Prova escrita',t:'quiz',need:2,qs:[['Um companheiro é capturado durante a missão. O que fazer?',['Abandoná-lo e cumprir a missão','Planejar o resgate com o time','Atacar sozinho'],1],['Qual elemento supera a Água?',['Fogo','Terra','Vento'],1],['Antes de infiltrar território inimigo, o mais sábio é…',['Reunir informações','Entrar à força','Agir sem plano'],0]]},
+{n:'2ª Fase · Floresta da Morte',t:'chk',c:3,need:2,dc:13},
+{n:'3ª Fase · Torneio',t:'fight',f:[['Candidato de Kusa',90,13,'terra'],['Finalista do Torneio',170,18,'relampago',1]]}],[
+{n:'1ª Fase · Prova de estratégia',t:'chk',c:3,need:2,dc:16},
+{n:'2ª Fase · Missão secreta',t:'chk',c:4,need:3,dc:17},
+{n:'3ª Fase · Provação final',t:'fight',f:[['Rival da Anbu',210,22,'agua'],['Kakashi Hatake, o Examinador',320,27,'relampago',1]]}]];
+// Senseis fortes e os elementos que podem ensinar
+const SEN={kakashi:['relampago','fogo'],jiraiya:['fogo','terra','agua'],tsunade:['terra','vento']};
+const TL=[1,3,6],TC=[60,140,280];
+const EXM=[['Iruka (examinador)',70,10,''],['Examinador Chunin',110,15,''],['Examinador Jounin',150,19,'']];
+const mu=(a,b)=>!a||!b?1:E[a][2]==b?1.5:E[b][2]==a?.7:1;
+const rl=v=>v<0?'😠 Hostil':v<20?'🙂 Conhecido':v<50?'😄 Amigo':v<80?'💛 Melhor amigo':'🔥 Irmão de armas';
+const ROM=/te amo|amo você|gosto de você|beij|namor|linda|lindo|bonit|gata|gato|sair comigo|encontro|cantada|paquer|flert/,SEXY=/sexo|transa|pelad|safad/;
+
+/* ================= 3. ESTADO E SAVE ================= */
+const SV='naruto-rpg-v2';
+let S=null,mode='map',B=null,M=null,T=null,X=null;
+const fresh=(n,a,el)=>({n,a,el,lv:1,xp:0,hp:60,mh:60,ck:30,mc:30,ryo:100,day:1,t:0,loc:'academia',rk:a>=12?1:0,academySessions:0,nin:5,tai:5,vel:5,int:5,car:5,rel:{},love:{},rs:{},partner:null,done:0,jt:[el+':0'],ms:{},kit:1,pill:1,got:{},cd:{},pres:{}});
+const save=()=>{try{localStorage.setItem(SV,JSON.stringify(S))}catch(e){}};
+const ld=()=>{try{return JSON.parse(localStorage.getItem(SV)||localStorage.getItem('naruto-rpg-v1'))}catch(e){return null}};
+const slot=()=>S.day*3+S.t;
+// Jutsu: jt = técnicas conhecidas ('elemento:nível'), ms = usos de cada uma (8 usos = 1 nível de maestria, máx. 5)
+const mlv=k=>Math.min(5,Math.floor((S.ms[k]||0)/8)),tmast=()=>Object.values(S.ms).reduce((a,b)=>a+b,0);
+const els=()=>[...new Set(S.jt.map(k=>k.split(':')[0]))],jc=k=>Math.ceil([8,15,25][+k.split(':')[1]]*(1-.07*mlv(k)));
+const exok=x=>S.lv>=x.lv&&S.done>=x.dn&&(!x.el||els().length>=x.el)&&(!x.mm||tmast()>=x.mm);
+const exreq=x=>`Nv ${x.lv}${x.dn?` · ${x.dn} missões`:''}${x.mm?` · ${x.mm} usos de jutsu`:''}${x.el?` · ${x.el} elementos`:''}`;
+const used=k=>S.cd[k]==slot()||(S.cd[k]=slot(),false);   // true se a ação já foi feita neste período do dia
+
+/* ================= 4. MOTOR DO JOGO ================= */
+function log(h,c=''){const d=document.createElement('p');d.className=c;d.innerHTML=h;$('#log').append(d);$('#log').scrollTop=1e9;save()}
+function tick(n=1){S.t+=n;while(S.t>=3){S.t-=3;S.day++;S.hp=Math.min(S.mh,S.hp+Math.ceil(S.mh*.4));S.ck=S.mc;log(`🌅 Dia ${S.day} amanhece em Konoha.`,'sys')}S.pres={}}
+function gain(x){S.xp+=x;while(S.xp>=S.lv*40){S.xp-=S.lv*40;S.lv++;S.mh+=10;S.mc+=6;S.hp=S.mh;S.ck=S.mc;S[P(AT)]++;S[P(AT)]++;log(`⬆️ <b>Nível ${S.lv}!</b> Seus atributos aumentaram.`,'ok');if(S.lv==4||S.lv==8)learn(S.el+':'+(S.lv==4?1:2),1)}}
+function learn(k,v){if(S.jt.includes(k))return;S.jt.push(k);if(v){const[e,i]=k.split(':');log(`✨ Novo jutsu: <b>${E[e][3][i]}</b>!`,'ok')}}
+function pres(l){if(!S.pres[l]){const p=L[l][2],f=['academia','ichiraku','torre'].includes(l)?[p[0]]:[],r=p.filter(x=>!f.includes(x)).sort(()=>Math.random()-.5);S.pres[l]=f.concat(r).slice(0,S.t==2?2:3)}return S.pres[l]}  // à noite há menos gente na rua
+function go(k){if(S.a<=10&&S.rk==0&&k!='academia'){log('📚 Você ainda não se formou. Iruka pede que conclua as aulas e o exame antes de sair da Academia.','sys');return render()}S.loc=k;tick(1);mode='map';log(`🚶 Você segue para <b>${L[k][1]}</b>.`,'sys');if(Math.random()<.25)ev();render()}
+function ev(){const r=R(1,4);if(r==1){const y=R(10,40);S.ryo+=y;log(`💰 Você encontra ${y} ryo no chão!`)}else if(r==2){log('⚠️ Você é emboscado no caminho!','bad');fight(EN[P(['ladrao','lobo'])],{})}else if(r==3)log(P(['🗣️ Ouve rumores sobre uma organização de capas negras.','🗣️ Dizem que Naruto devorou 12 tigelas de ramen hoje.','🗣️ Um mercador comenta que o Hokage busca novos Chunin.']),'sys');else{gain(6);log('🥷 Um ninja de passagem corrige sua postura. (+6 XP)')}}
+function academyClass(){if(S.loc!='academia'||S.rk!=0||S.a>10)return;S.academySessions=(S.academySessions||0)+1;S.ck=Math.min(S.mc,S.ck+8);gain(12);rel('iruka',2);log(`📚 Aula ${S.academySessions}/4 concluída: você pratica controle de chakra, técnicas básicas e trabalho em equipe. +12 XP.`,'ok');if(S.academySessions==4)log('🎓 Iruka libera você para o exame de graduação. Prepare-se e vença o examinador!','bt');tick(1);render()}
+function self(k){if(k=='s'){log('🛏️ Você dorme e acorda renovado.','sys');tick(3-S.t);return render()}
+if(k=='m'){S.ck=Math.min(S.mc,S.ck+20);if(Math.random()<.4)S.int++;log('🧘 Você medita e recupera chakra.');tick(1);return render()}
+if(S.ck<5)return log('Chakra insuficiente para treinar.','sys');S.ck-=5;const a=P(ST);S[a]+=Math.random()<.35?1:0;gain(R(8,14));log(`🥋 Você treina com afinco (${a.toUpperCase()}).`);tick(1);render()}
+function item(t){if(t=='kit'){S.kit--;S.hp=Math.min(S.mh,S.hp+40)}else{S.pill--;S.ck=Math.min(S.mc,S.ck+40)}log(t=='kit'?'🩹 Você usa um kit médico.':'💊 Você toma uma pílula.');render()}
+function buy(t,c){if(S.ryo<c)return log('Ryo insuficiente.','sys');S.ryo-=c;if(t=='scr'){const a=P(AT);S[a]++;log(`📜 Você estuda o pergaminho: +1 ${a.toUpperCase()}.`)}else{S[t]++;log('🛒 Compra feita.')}render()}
+function exam(){const x=EXR[S.rk];if(!exok(x))return log(`🔒 Requisitos: ${exreq(x)}.`,'sys');
+if(S.cd.ex==S.day)return log('📋 Os examinadores pedem que você volte amanhã.','sys');
+if(S.rk==0){log('📝 O exame começa! Derrote o examinador.','bt');return fight(EXM[0],{sp:1,win:()=>{S.rk++;S.ryo+=100;log(`🎉 Você foi promovido a <b>${RK[S.rk]}</b>!`,'ok')}})}
+X={rk:S.rk,s:0,i:0,ok:0};log(`🏟️ <b>${['','Exame Chunin','Exame Jounin'][S.rk]}</b>: três fases decidem seu futuro.`,'bt');exNext()}
+function exNext(){const g=EXS[X.rk][X.s];
+if(!g){const y=X.rk*150;S.rk++;S.ryo+=y;ST.forEach(k=>S[k]+=2);S.mh+=20;S.mc+=10;S.hp=S.mh;S.ck=S.mc;log(`🎉 Você passou! Promovido a <b>${RK[S.rk]}</b>! +${y} ryo e atributos aumentados.`,'ok');log(S.rk==2?'🔓 Agora você pode dominar um 2º elemento com um sensei forte (Kakashi, Jiraiya, Tsunade).':'🔓 Agora você pode dominar um 3º elemento.','bt');X=null;mode='map';tick(1);return render()}
+X.i=0;X.ok=0;log(`📋 <b>${g.n}</b>`,'bt');if(g.t=='fight')return exFight(0);X.cur=P(STP);mode='ex';render()}
+function exFight(i){const g=EXS[X.rk][X.s];fight(g.f[i],{sp:1,win:()=>{if(i+1<g.f.length)exFight(i+1);else{X.s++;exNext()}}})}
+function exa(j){const g=EXS[X.rk][X.s];let r;
+if(g.t=='quiz'){r=j==g.qs[X.i][2];log(r?'✅ Resposta correta.':'❌ Resposta errada.',r?'ok':'bad')}
+else{const c=X.cur[1][j],d=R(1,20),tt=d+S[c[1]];r=tt>=g.dc;log(`🎲 ${c[0]}: ${d} + ${S[c[1]]} = ${tt} (precisa de ${g.dc})`,'sys');if(r)log('Você supera o obstáculo.','ok');else{S.hp=Math.max(1,S.hp-12);log('Falhou e perdeu 12 HP.','bad')}}
+X.ok+=r?1:0;X.i++;const n=g.t=='quiz'?g.qs.length:g.c;
+if(X.i<n){X.cur=P(STP);return render()}
+if(X.ok>=g.need){log(`✔️ Fase concluída (${X.ok}/${n})!`,'ok');X.s++;exNext()}else{log(`❌ Você foi reprovado nesta fase (${X.ok}/${n}). Tente novamente amanhã.`,'bad');X=null;S.cd.ex=S.day;mode='map';tick(1);render()}}
+function teach(k){const id=T,n=N[id],[e,s]=k.split(':'),i=+s;
+if((S.rel[id]||0)<40)return log(`<b>${n[0]}:</b> “Ainda não confio o bastante para ensinar isso a você.” (Afinidade 40)`);
+if(i>0&&!S.jt.includes(e+':'+(i-1)))return log(`<b>${n[0]}:</b> “Domine a técnica anterior deste elemento primeiro.”`);
+if(!els().includes(e)&&els().length>=Math.max(1,S.rk))return log(`🔒 Seu rank só permite ${Math.max(1,S.rk)} elemento(s). Chunin libera o 2º, Jounin o 3º.`,'bad');
+if(S.lv<TL[i])return log(`<b>${n[0]}:</b> “Você ainda não tem preparo para isso.” (Nv ${TL[i]})`);
+if(S.ryo<TC[i])return log('Ryo insuficiente para o treinamento.','sys');
+if(used('sen'+id))return log(`<b>${n[0]}:</b> “Descanse um pouco. Continuamos mais tarde.”`);
+S.ryo-=TC[i];learn(k);gain(15+i*10);log(`🎓 ${n[0]} guia você na técnica <b>${E[e][3][i]}</b>! (-${TC[i]} ryo)`,'ok');
+if(i==2){S.nin+=2;log(`🏅 Você agora <b>domina o elemento ${E[e][0]}</b>! +2 Nin.`,'ok')}
+tick(1);render()}
+function prac(k){const c=jc(k);if(S.ck<c)return log('Chakra insuficiente para praticar.','sys');S.ck-=c;const b=mlv(k);S.ms[k]=(S.ms[k]||0)+4;gain(6);log(`🎯 Você pratica ${jn(k)}.${mlv(k)>b?` ⭐ <b>Maestria ${mlv(k)}!</b>`:''}`,'ok');tick(1);render()}
+
+/* ================= 5. SOCIAL ================= */
+const rel=(id,v)=>{S.rel[id]=(S.rel[id]||0)+v};
+const npc=id=>{T=id;mode='npc';if(!S.rel[id])S.rel[id]=0;render()};
+const AC={
+talk:(id,n)=>{if(!used('talk'+id)){rel(id,2);gain(2);if(Math.random()<.15)S.car++}log(`<b>${n[0]}:</b> ${P(n[3])}`)},
+gift:(id,n,g)=>{const[gn,c]=G[g];if(S.ryo<c)return log('Você não tem ryo suficiente.','sys'),1;S.ryo-=c;const fav=(RM[id]||['dango'])[0]==g;rel(id,fav?10:4);if(RM[id]&&S.a>=18)love(id,fav?3:1);log(`🎁 ${n[0]} ${fav?'adora':'aceita'} ${gn}. <b>“Obrigado(a), ${esc(S.n)}!”</b>`)},
+train:(id,n)=>{if(S.ck<5)return log('Chakra insuficiente.','sys'),1;S.ck-=5;rel(id,3);gain(14);if(Math.random()<.4)S[n[5][0]=='mh'?'tai':n[5][0]]++;const k=P(S.jt);S.ms[k]=(S.ms[k]||0)+2;log(`🥋 Você treina ao lado de ${n[0]}.`);tick(1)},
+duel:(id,n)=>{log(`⚔️ Você desafia ${n[0]} para um duelo amistoso!`);fight([n[0],n[4][0],n[4][1],n[4][2]],{sp:1,win:()=>{rel(id,4);log(`🤝 ${n[0]} reconhece sua força.`,'ok')}});return 1},
+adv:(id,n)=>{if((S.rel[id]||0)<35)return log(`<b>${n[0]}:</b> “Ainda não nos conhecemos bem o bastante…” (precisa de afinidade 35)`),1;if(S.got[id])return log(`<b>${n[0]}:</b> “Já lhe disse tudo o que sei.”`),1;S.got[id]=1;const s=n[5][0];if(s=='mh'){S.mh+=10;S.hp+=10}else S[s]+=2;gain(20);log(`✨ ${n[5][1]} <b>(+${s=='mh'?'10 HP':'2 '+s.toUpperCase()})</b>`,'ok')},
+bully:(id,n)=>{rel(id,-8);if(S.rs[id])love(id,-10);log(`😈 Você provoca ${n[0]}. <b>“Está pedindo para apanhar?”</b>`,'bad');if(Math.random()<.5){fight([n[0],n[4][0],n[4][1],n[4][2]],{sp:1});return 1}}};
+function dn(a,x){if(!AC[a](T,N[T],x))render()}
+function say(prompt){const t=(prompt||($('#fr').value||'')).trim();if(!t)return;const n=N[T],l=t.toLowerCase();log(`<b>Você:</b> ${esc(t)}`);
+if(SEXY.test(l)){rel(T,-4);log(`<b>${n[0]}:</b> ${P(['“Opa, mais respeito!”','“Esse não é jeito de falar comigo.”'])}`,'bad');return render()}
+if(ROM.test(l)){if(rom(T))return flirt();log(`<b>${n[0]}:</b> “Hehe, você é gentil… mas prefiro que sejamos apenas amigos.”`);return render()}
+const o=Object.keys(N).find(k=>k!=T&&l.includes(N[k][0].split(' ')[0].toLowerCase()));
+let r=o?`“${N[o][0]}? ${P(['É um bom shinobi.','Cuidado com ele(a).','Somos mais próximos do que parece.','Não tenho muito a dizer.'])}”`:chatReply(T,l);
+if(/idiota|feio|fraco|burro/.test(l)){rel(T,-5);r='“Como é que é?!” — '+n[0]+' fecha a cara.'}else{rel(T,1);if(S.rel[T]>=20)r+=' '+P(['Fico feliz que tenha perguntado.','Gosto de poder conversar com você.','Pode contar comigo.'])}
+log(`<b>${n[0]}:</b> ${r}`);render()}
+function chatReply(id,text){
+const topic=[[/ramen|comer|fome|comida|dango/,'ramen'],[/sonho|futuro|hokage|objetivo/,'sonho'],[/miss|trabalh|tarefa/,'missao'],[/trein|forte|poder|luta|melhorar/,'treino'],[/amig|confian|amizade|gosta de mim/,'amizade'],[/medo|triste|sozinh|preocup/,'apoio'],[/vila|konoha|casa/,'vila']].find(([p])=>p.test(text));
+const A={
+ramen:id=='teuchi'?['A melhor parte é ver todo mundo sair daqui mais feliz. Qual tigela você costuma pedir?','Meu segredo é o caldo, cozido com paciência. Naruto sempre pede uma porção extra.']:['Um bom ramen resolve metade dos problemas. A outra metade costuma precisar de treino.','Depois de um dia difícil, uma tigela quente ajuda a colocar as ideias no lugar.'],
+sonho:id=='naruto'?['Vou ser Hokage e fazer todo mundo reconhecer meu valor! E você, qual é o seu sonho?']:id=='konohamaru'?['Vou superar o Naruto e me tornar Hokage! Ainda tenho muito treino pela frente.']:['Quero ficar forte o bastante para proteger as pessoas importantes para mim. E você?'],
+missao:id=='tsunade'?['Missões fazem parte da vida shinobi. Comece pelas simples e não subestime os detalhes.']:['Uma missão bem-feita depende de observar antes de agir. O que você faria primeiro?'],
+treino:id=='lee'?['Treine o básico até que seu corpo responda sem hesitar. Vamos começar com algumas voltas!']:id=='iruka'?['Domine os fundamentos antes de buscar técnicas difíceis. Controle de chakra e trabalho em equipe são essenciais.']:['Treino constante vale mais que um esforço enorme de vez em quando. Qual habilidade quer desenvolver?'],
+amizade:id=='kakashi'?['Um companheiro é alguém em quem você confia, mesmo quando a missão fica difícil.']:['Amizade também é aparecer quando alguém precisa. Não é preciso fazer isso sozinho.'],
+apoio:id=='hinata'?['Eu também fico nervosa às vezes… mas um passo pequeno ainda é um passo.']:['Sentir isso não faz de você menos forte. Converse com alguém de confiança e siga no seu ritmo.'],
+vila:id=='iruka'?['Konoha é feita pelas pessoas que cuidam umas das outras. É por isso que vale a pena protegê-la.']:['Cada lugar da vila tem sua própria história. Qual é o seu canto favorito?']};
+if(topic)return P(A[topic[1]]);
+if(/\?$|\b(como|por que|porque|quem|quando|onde)\b/.test(text))return P(['Boa pergunta. O que fez você pensar nisso?','Nunca tinha pensado por esse lado. O que você acha?','Depende da situação. Pode me contar um pouco mais?']);
+const h=esc(text.slice(0,70)+(text.length>70?'…':''));
+return P([`Entendi: “${h}”. O que aconteceu depois?`,'Isso parece importante para você. Como se sente a respeito?','Hm, quero entender melhor. O que você faria nessa situação?'])}
+function fr(){const t=($('#fr').value||'').trim();if(!t)return;const l=t.toLowerCase();log(`<b>Você:</b> ${esc(t)}`);
+const o=pres(S.loc).find(k=>l.includes(N[k][0].split(' ')[0].toLowerCase()));
+if(o){T=o;if(/ataca|luta|duelo|desafi/.test(l))return dn('duel');if(/provoc|zomb|pregar|ofend|peça/.test(l))return dn('bully');mode='npc';rel(o,1);log(`<b>${N[o][0]}:</b> ${P(N[o][3])}`);return render()}
+if(/ramen|comer|fome|dango/.test(l)){if(S.ryo<15)log('Você está sem ryo para comer.','sys');else{S.ryo-=15;S.hp=Math.min(S.mh,S.hp+25);S.ck=Math.min(S.mc,S.ck+10);log('🍜 Você devora uma tigela. Delícia!');tick(1)}}
+else if(/treina|treino/.test(l))return self('t');else if(/medit/.test(l))return self('m');else if(/dorm|descans/.test(l))return self('s');
+else if(/roub|furt/.test(l)){if(R(1,20)+S.vel>=18){const y=R(15,50);S.ryo+=y;log(`🕶️ Você rouba ${y} ryo sem ser notado.`)}else{S.hp=Math.max(1,S.hp-10);pres(S.loc).forEach(k=>rel(k,-6));log('🚨 Pego em flagrante! Todos ao redor desaprovam.','bad')}tick(1)}
+else if(/pesc|nadar/.test(l)){const y=R(8,30);S.ryo+=y;gain(5);log(`🎣 Você passa um tempo à beira do rio e lucra ${y} ryo.`);tick(1)}
+else if(/explor|andar|passear/.test(l)){log('🧭 Você explora os arredores.','sys');ev();tick(1)}
+else if(/pegadinha|prank|peça|piada/.test(l)){gain(5);pres(S.loc).forEach(k=>rel(k,R(-3,3)));log('😜 Você apronta uma travessura em plena Konoha! Alguns riem, outros não.');tick(1)}
+else{gain(3);log(`✨ ${P(['Você tenta','Você decide','Você se arrisca a'])}: <i>${esc(t)}</i>. ${P(['Os moradores observam curiosos.','O vento de Konoha sopra e algo muda dentro de você.','Um ninja ao longe assente em aprovação.'])}`);tick(1)}
+render()}
+
+/* ================= 6. ROMANCE (jogador 18+ e personagens adultos) ================= */
+const rom=id=>S.a>=18&&!!RM[id];
+const love=(id,v)=>{S.love[id]=Math.max(0,Math.min(100,(S.love[id]||0)+v))};
+function flirt(){const id=T,n=N[id];
+if((S.rel[id]||0)<15){log(`<b>${n[0]}:</b> “Mal nos conhecemos… vamos conversar primeiro.” (Afinidade 15)`);return render()}
+if(used('flt'+id)){log(`<b>${n[0]}:</b> “Calma, acabamos de conversar. Me dê um tempo…”`);return render()}
+const r=R(1,20),tt=r+S.car+Math.floor(S.rel[id]/10)+(S.rs[id]?3:0);
+log(`🎲 Flertar: ${r} + ${S.car} (carisma) + bônus = ${tt} (precisa de 14)`,'sys');
+if(tt>=14){love(id,R(3,6));log(`😉 <b>${n[0]}:</b> ${RM[id][1]}`,'ok')}else{love(id,-2);rel(id,-2);log(`😅 <b>${n[0]}:</b> ${RM[id][2]}`,'bad')}
+const p=S.partner;if(p&&p!=id&&Math.random()<.6){love(p,-12);rel(p,-5);log(`😡 ${N[p][0]} soube que você andou flertando por aí… e não ficou nada feliz.`,'bad')}
+render()}
+function inv(){const id=T,n=N[id];
+if((S.rel[id]||0)<30||(S.love[id]||0)<20){log(`<b>${n[0]}:</b> “Acho que ainda não temos intimidade para isso…” (Afinidade 30 e Intimidade 20)`);return render()}
+if(S.ryo<40){log('Você não tem ryo suficiente para o encontro.','sys');return render()}
+if(used('date'+id)){log(`<b>${n[0]}:</b> “Acabamos de passar um tempo juntos. Vamos mais tarde?”`);return render()}
+S.ryo-=40;mode='date';log(`🌹 ${n[0]} aceita o convite. <b>“Aonde vamos?”</b>`);render()}
+function dt(i){const id=T,n=N[id],[l,a]=DT[i],r=R(1,20),tt=r+S[a]+Math.floor((S.rel[id]||0)/10);
+log(`🎲 ${l}: ${r} + ${S[a]} + bônus = ${tt} (precisa de 15)`,'sys');
+if(tt>=15){love(id,R(8,14));rel(id,3);log(`💕 ${P(['O clima é perfeito','Vocês riem como velhos amigos','Os olhares dizem mais que as palavras'])}. ${n[0]} parece encantado(a).`,'ok')}else{love(id,2);log('😅 O encontro é um pouco desajeitado, mas ainda assim agradável.')}
+if(!S.rs[id])S.rs[id]='date';mode='npc';tick(1);render()}
+function ask(){const id=T,n=N[id];
+if(S.partner&&S.partner!=id){log(`💔 Você já está com ${N[S.partner][0]}. Termine antes de começar outro namoro.`,'bad');return render()}
+if((S.love[id]||0)<55){log(`<b>${n[0]}:</b> “Ainda não estou pronto(a) para isso… me dê mais tempo.” (Intimidade 55)`);return render()}
+S.rs[id]='couple';S.partner=id;love(id,5);log(`💍 <b>${n[0]}:</b> “Sim! Quero tentar isso com você.” — Vocês estão <b>namorando</b>!`,'ok');render()}
+function couple(a){const id=T,n=N[id],lv=S.love[id]||0;
+if(a=='t'){if(used('ct'+id))log(`${n[0]} sorri: “Vamos deixar para mais tarde, ok?”`,'sys');else{love(id,3);S.hp=Math.min(S.mh,S.hp+15);log(`🍃 Você e ${n[0]} passam um tempo tranquilo juntos. (+15 HP)`);tick(1)}}
+else if(a=='k'){if(lv<60)log(`<b>${n[0]}:</b> “Ainda é cedo para isso…” (Intimidade 60)`);else if(used('k'+id))log(`${n[0]} ri: “Você é insistente!”`,'sys');else{love(id,2);log(`💋 Você e ${n[0]} trocam um beijo carinhoso sob a luz do fim de tarde.`,'ok')}}
+else if(a=='n'){if(lv<90)log(`<b>${n[0]}:</b> “Quero esperar um pouco mais…” (Intimidade 90)`);else if(S.t!=2)log(`${n[0]} sussurra: “Só à noite…”`,'sys');else if(S.cd['n'+id]==S.day)log(`${n[0]} sorri: “Já foi especial por hoje.”`,'sys');else{S.cd['n'+id]=S.day;love(id,3);S.hp=S.mh;S.ck=S.mc;log(`🌙 ${n[0]} sorri, apaga a lanterna e a noite fica só para vocês dois… <i>(a cena termina aqui)</i> Você acorda descansado(a). HP e chakra restaurados.`,'ok');tick(1)}}
+else if(a=='x'&&confirm(`Terminar o namoro com ${n[0]}?`)){love(id,-35);rel(id,-15);S.rs[id]='';S.partner=null;log(`💔 Vocês terminam. ${n[0]} desvia o olhar e se afasta.`,'bad')}
+render()}
+
+/* ================= 7. COMBATE ================= */
+function fight(e,o){B={n:e[0],hp:e[1],mx:e[1],atk:e[2],el:e[3],boss:e[4],o:o||{},df:0,tn:0,ch:0,ph:0};mode='battle';log(B.boss?`👹 <b>CHEFE: ${B.n}</b> surge diante de você!`:`⚔️ <b>${B.n}</b> ${B.el?E[B.el][1]:''} entra em combate!`,'bt');render()}
+function act(t,i){let d=0,m='';
+if(t=='tai'){const c=Math.random()*100<10+S.vel*.5;d=Math.round((5+S.tai*1.6)*R(8,12)/10*(c?1.8:1));m=`👊 ${c?'<b>Golpe crítico!</b> ':'Você acerta: '}<b>${d}</b> de dano.`}
+else if(t=='jut'){const[e,ti]=i.split(':'),c=jc(i);if(S.ck<c)return log('Chakra insuficiente!','sys');S.ck-=c;const x=mu(e,B.el),b=mlv(i);d=Math.round((4+S.nin*1.7)*[1.5,2.1,2.9][+ti]*(1+.12*b)*x*R(9,11)/10);S.ms[i]=(S.ms[i]||0)+1;m=`${E[e][1]} <b>${E[e][3][ti]}</b>! <b>${d}</b> de dano${x>1?' (vantagem elemental!)':x<1?' (resistido)':''}.${mlv(i)>b?` ⭐ <b>Maestria ${mlv(i)}!</b>`:''}`}
+else if(t=='def'){B.df=1;S.ck=Math.min(S.mc,S.ck+6);m='🛡️ Você se defende e recupera o fôlego.'}
+else if(t=='kit'){S.kit--;S.hp=Math.min(S.mh,S.hp+40);m='🩹 Kit médico usado (+40 HP).'}
+else if(t=='pill'){S.pill--;S.ck=Math.min(S.mc,S.ck+40);m='💊 Pílula usada (+40 chakra).'}
+else if(t=='run'){if(B.boss)return log('🚫 Não há como fugir de um chefe!','bad');if(Math.random()<.4+S.vel*.02){log('💨 Você escapou!');B=null;M=null;X&&(X=null,S.cd.ex=S.day);mode='map';return render()}m='Você não conseguiu fugir!'}
+log(m);B.hp-=d;
+if(B.hp<=0){log(`🏆 <b>${B.n}</b> foi derrotado!`,'ok');const o=B.o,bs=B.boss;B=null;mode='map';gain(o.sp?12:18);o.win&&o.win();if(bs){S.kit++;S.pill++;log('🎁 O chefe deixa suprimentos: +1 kit médico e +1 pílula.','ok')}return render()}
+enemyTurn();B.df=0;
+if(S.hp<=0){const sp=B.o.sp;B=null;mode='map';if(sp){S.hp=1;gain(6);if(X){X=null;S.cd.ex=S.day;log('❌ Você foi eliminado do exame. Tente de novo amanhã.','bad')}log('😮‍💨 Você perdeu o duelo, mas aprendeu algo.')}else{S.hp=Math.ceil(S.mh/2);S.ryo=Math.floor(S.ryo*.8);S.loc='hospital';M=null;S.pres={};log('😵 Você desmaiou e acorda no hospital. Perdeu parte dos ryo.','bad');tick(3)}}
+render()}
+function enemyTurn(){B.tn++;
+if(B.boss&&!B.ph&&B.hp<B.mx/2){B.ph=1;B.atk=Math.round(B.atk*1.25);log(`🔥 ${B.n} libera todo o seu poder! <b>Fase 2!</b>`,'bad')}
+if(B.boss&&B.ch){B.ch=0;const e=Math.round(B.atk*2.2*(B.df?.35:1));S.hp-=e;return log(`💥 ${B.n} desfere o golpe devastador: <b>${e}</b> de dano${B.df?' (reduzido pela defesa)':''}!`,'bad')}
+if(B.boss&&B.tn%3==0){B.ch=1;return log(`⚠️ ${B.n} concentra chakra para um ataque devastador! <b>Defenda-se!</b>`,'bt')}
+if(Math.random()*100<S.vel*1.2)return log('💨 Você esquiva do ataque!');
+const e=Math.round(B.atk*R(8,12)/10*(B.df?.4:1)*(B.el&&mu(B.el,S.el)>1?1.3:1));S.hp-=e;log(`💥 ${B.n} ataca: <b>${e}</b> de dano.`,'bad')}
+
+/* ================= 8. MISSÕES (rank D a S) ================= */
+function smis(i){const m=MS[i];M={m,i,s:0,n:2+MSK.indexOf(m[0])};log(`📜 <b>Missão rank ${m[0]}: ${m[1]}</b> — ${m[2]}`);nx()}
+function nx(){if(M.s<M.n){M.cur=P(STP);mode='mis';render()}else{const m=M.m,e=EN[m[3]];log(e[4]?`Você chega ao covil… e o líder da missão o aguarda.`:'Você chega ao objetivo e o confronto é inevitável!','bt');
+fight(e,{win:()=>{S.ryo+=m[4];gain(m[5]);S.done++;log(`✅ Missão rank ${m[0]} cumprida! +${m[4]} ryo e +${m[5]} XP. (Total: ${S.done})`,'ok');M=null;tick(1)}})}}
+function pick(j){const c=M.cur[1][j],ri=MSK.indexOf(M.m[0]),dc=10+ri*3,r=R(1,20),tt=r+S[c[1]];
+log(`🎲 ${c[0]}: ${r} + ${S[c[1]]} = ${tt} (precisa de ${dc})`,'sys');
+if(tt>=dc){gain(8+ri*2);log('Deu certo! Você avança.','ok')}else{const d=6+ri*4;S.hp=Math.max(1,S.hp-d);log(`Falhou e perdeu ${d} HP, mas segue em frente.`,'bad')}
+M.s++;nx()}
+
+/* ================= 9. TELAS ================= */
+const back=btn('↩️ Voltar',"mode='map';render()");
+function vMap(){const x=EXR[S.rk],ex=S.rk<3&&S.loc==x.loc&&(S.rk>0||S.a>10||(S.academySessions||0)>=4);
+return `<h3>${L[S.loc][0]} ${L[S.loc][1]}</h3><div class="g">`+pres(S.loc).map(id=>btn(`${N[id][1]} ${N[id][0]}<small>${N[id][2]} · ${rl(S.rel[id]||0)}${S.rs[id]=='couple'?' · 💞':''}</small>`,`npc('${id}')`)).join('')+'</div><h4>Ir para</h4><div class="g">'+Object.keys(L).filter(k=>k!=S.loc).map(k=>btn(L[k][0]+' '+L[k][1],`go('${k}')`)).join('')
++'</div><h4>Ações</h4><div class="g">'+btn('🥋 Treinar sozinho',"self('t')")+btn('🧘 Meditar',"self('m')")+btn('🎯 Praticar jutsu',"mode='jt';render()")+btn('🛏️ Descansar até amanhã',"self('s')")+(S.kit?btn('🩹 Usar kit médico',"item('kit')"):'')+(S.pill?btn('💊 Usar pílula',"item('pill')"):'')
++(S.loc=='torre'&&S.rk>0?btn('📜 Pegar missão',"mode='ms';render()",'p'):'')+(S.loc=='mercado'?btn('🛒 Loja ninja',"mode='shop';render()",'p'):'')
++(S.loc=='academia'&&S.rk==0&&S.a<=10?btn(`📚 Aula prática (${S.academySessions||0}/4)`,'academyClass()'):'')
++(ex?btn(x.nm+(exok(x)?'':`<small>🔒 ${exreq(x)}</small>`),'exam()',exok(x)?'p':'lock'):'')
++`</div><div class="row"><input type="text" id="fr" placeholder="O que você quer fazer? Ex.: pregar uma peça na Anko" onkeydown="if(event.key=='Enter')fr()">${btn('Ir','fr()','p')}</div>`}
+function vNpc(){const id=T,n=N[id],lv=S.love[id]||0,st=S.rs[id];
+let h=`<h3>${n[1]} ${n[0]}</h3><small style="color:var(--mu)">${n[2]} · ${rl(S.rel[id]||0)} (${S.rel[id]||0})</small><div class="g" style="margin-top:8px">`+btn('💬 Conversar',"dn('talk')")+btn('🥋 Treinar juntos',"dn('train')")+btn('⚔️ Duelo amistoso',"dn('duel')")+btn('🤝 Pedir conselho',"dn('adv')")+btn('😈 Provocar',"dn('bully')")+(SEN[id]?btn('🎓 Aprender técnicas',"mode='sen';render()",'p'):'')+back
++'</div><h4>Presentear</h4><div class="g">'+Object.keys(G).map(g=>btn(`${G[g][0]}<small>${G[g][1]} ryo</small>`,`dn('gift','${g}')`)).join('')+'</div>';
+if(rom(id))h+=`<h4>Romance${st=='couple'?' · 💞 Namorando':st=='date'?' · 💕 Saindo juntos':''}</h4>`+bar('💗 Intimidade',lv,100,'lv')+'<div class="g">'+btn('😉 Flertar',"flirt()")+btn('🌹 Convidar para sair<small>40 ryo</small>',"inv()")
++(st=='date'?btn('💍 Pedir em namoro',"ask()"):'')+(st=='couple'?btn('🍃 Tempo juntos',"couple('t')")+btn('💋 Beijar',"couple('k')")+btn('🌙 Noite a dois',"couple('n')")+btn('💔 Terminar',"couple('x')"):'')+'</div>';
+return h+`<h4>Começar um assunto</h4><div class="g">`+btn('🍃 Sobre Konoha',"say('O que você mais gosta em Konoha?')")+btn('🥋 Sobre treinamento',"say('Como posso melhorar no treinamento?')")+btn('🌠 Sobre sonhos',"say('Qual é o seu maior sonho?')")+btn('🧑‍🤝‍🧑 Sobre amizade',"say('O que faz alguém ser um bom amigo?')")+`</div><div class="row"><input type="text" id="fr" placeholder="Diga qualquer coisa a ${n[0]}…" onkeydown="if(event.key=='Enter')say()">${btn('Falar','say()','p')}</div>`}
+const vDate=()=>`<h3>🌹 Encontro com ${N[T][0]}</h3><p>Como vocês vão passar o tempo?</p><div class="g">`+DT.map((d,i)=>btn(`${d[0]}<small>usa ${d[1].toUpperCase()}</small>`,`dt(${i})`)).join('')+'</div>';
+const vBattle=()=>`<h3>${B.boss?'👹':'⚔️'} ${B.n} ${B.el?E[B.el][1]:''}</h3>`+bar(B.boss?(B.ph?'Chefe · Fase 2':'Chefe'):'Inimigo',B.hp,B.mx,'hp')+(B.ch?'<p class="bad"><b>⚠️ Ataque devastador a caminho — defenda-se!</b></p>':'')+'<div class="g">'+btn('👊 Golpe',"act('tai')")+S.jt.map(k=>btn(`${jn(k)}<small>${jc(k)} chakra · Maestria ${mlv(k)}</small>`,`act('jut','${k}')`)).join('')+btn('🛡️ Defender',"act('def')")+(S.kit?btn('🩹 Kit',"act('kit')"):'')+(S.pill?btn('💊 Pílula',"act('pill')"):'')+btn('💨 Fugir',"act('run')")+'</div>';
+const vMis=()=>`<h3>📜 ${M.m[1]} ${rkb(M.m[0])}</h3><small style="color:var(--mu)">Etapa ${M.s+1}/${M.n}${EN[M.m[3]][4]?' · um chefe espera no fim':''}</small><p>${M.cur[0]}</p><div class="g">`+M.cur[1].map((c,i)=>btn(`${c[0]}<small>usa ${c[1].toUpperCase()}</small>`,`pick(${i})`)).join('')+'</div>';
+const vBoard=()=>'<h3>📜 Mural de missões</h3><div class="g">'+MS.map((m,i)=>{const r=m[0],ok=S.rk>=NEED[r]&&S.lv>=LVN[r],lk=ok?'':` · 🔒 ${RK[NEED[r]]}, Nv ${LVN[r]}`;return btn(`${rkb(r)}${m[1]}<small>${m[4]} ryo · ${m[5]} XP${lk}${EN[m[3]][4]?' · 👹 chefe':''}</small>`,ok?`smis(${i})`:`log('🔒 Requer ${RK[NEED[r]]} e Nv ${LVN[r]}.','sys')`,ok?'':'lock')}).join('')+back+'</div>';
+const vShop=()=>'<h3>🛒 Loja ninja</h3><div class="g">'+btn('🩹 Kit médico<small>25 ryo · +40 HP</small>',"buy('kit',25)")+btn('💊 Pílula de soldado<small>30 ryo · +40 chakra</small>',"buy('pill',30)")+btn('📜 Pergaminho de treino<small>120 ryo · +1 atributo</small>',"buy('scr',120)")+back+'</div>';
+const jn=k=>{const[e,i]=k.split(':');return E[e][1]+' '+E[e][3][i]};
+const vJt=()=>'<h3>🎯 Praticar jutsu</h3><small style="color:var(--mu)">A cada 8 usos a Maestria sobe (máx. 5): +12% de dano e −7% de custo por nível. Usar em combate e treinar com alguém também conta.</small><div class="g" style="margin-top:8px">'+S.jt.map(k=>btn(`${jn(k)}<small>Maestria ${mlv(k)}/5 · ${jc(k)} chakra</small>`,`prac('${k}')`)).join('')+back+'</div>';
+const vSen=()=>{const id=T,n=N[id];return `<h3>🎓 Treinar com ${n[0]}</h3><small style="color:var(--mu)">Afinidade 40+. Elementos: ${els().length}/${Math.max(1,S.rk)} (Chunin libera o 2º, Jounin o 3º).</small>`+SEN[id].map(e=>`<h4>${E[e][1]} ${E[e][0]}</h4><div class="g">`+[0,1,2].map(i=>{const k=e+':'+i,has=S.jt.includes(k);return btn(`${has?'✔ ':''}${E[e][3][i]}<small>${has?'Dominado · Maestria '+mlv(k):'Nv '+TL[i]+' · '+TC[i]+' ryo'}</small>`,has?"log('Você já domina esta técnica.','sys')":`teach('${k}')`,has?'lock':'')}).join('')+'</div>').join('')+`<div class="row">${back}</div>`};
+const vEx=()=>{const g=EXS[X.rk][X.s],n=g.t=='quiz'?g.qs.length:g.c;return `<h3>🏟️ ${g.n}</h3><small style="color:var(--mu)">Prova ${X.i+1}/${n} · acertos ${X.ok} (mínimo ${g.need})</small>`+(g.t=='quiz'?`<p>${g.qs[X.i][0]}</p><div class="g">`+g.qs[X.i][1].map((o,j)=>btn(o,`exa(${j})`)).join('')+'</div>':`<p>${X.cur[0]}</p><div class="g">`+X.cur[1].map((c,j)=>btn(`${c[0]}<small>usa ${c[1].toUpperCase()}</small>`,`exa(${j})`)).join('')+'</div>')};
+const V={map:vMap,npc:vNpc,date:vDate,battle:vBattle,mis:vMis,ms:vBoard,shop:vShop,jt:vJt,sen:vSen,ex:vEx};
+function render(){
+$('#st').innerHTML=`<b>${esc(S.n)}</b> · ${S.a} anos · ${E[S.el][1]} ${E[S.el][0]} · ${RK[S.rk]} · Nv ${S.lv}`+bar('❤️ HP',S.hp,S.mh,'hp')+bar('💠 Chakra',S.ck,S.mc,'ck')+bar('✨ XP',S.xp,S.lv*40,'ac')+`<small style="color:var(--mu)">💰 ${S.ryo} ryo · Dia ${S.day} (${TM[S.t]}) · Nin ${S.nin} · Tai ${S.tai} · Vel ${S.vel} · Int ${S.int} · Car ${S.car} · 🩹${S.kit} 💊${S.pill} · 📜 ${S.done} missões</small>`;
+$('#pn').innerHTML=V[mode]()}
+
+/* ================= 10. INÍCIO ================= */
+$('#els').innerHTML=Object.keys(E).map((k,i)=>`<label><input type="radio" name="el" value="${k}" ${i?'':'checked'}>${E[k][1]} ${E[k][0]}</label>`).join('');
+if(ld())$('#ct').hidden=false;
+const show=()=>{$('#cr').hidden=true;$('#gm').hidden=false;render()};
+function cont(){const v=ld();S=Object.assign(fresh(v.n,v.a,v.el),v);S.pres={};[0,1,2].forEach(i=>S.lv>=[1,4,8][i]&&learn(S.el+':'+i));mode='map';show();log('Você retoma sua jornada em Konoha.','sys')}
+function newg(){if(confirm('Começar um novo jogo? O progresso atual será perdido.')){try{localStorage.removeItem(SV);localStorage.removeItem('naruto-rpg-v1')}catch(e){}location.reload()}}
+function start(){const n=$('#nm').value.trim()||'Shinobi',a=Math.min(40,Math.max(6,+$('#ag').value||12)),el=document.querySelector('input[name=el]:checked').value;
+S=fresh(n,a,el);if(a>=16)ST.forEach(k=>S[k]+=2);S[({fogo:'nin',agua:'int',vento:'vel',terra:'tai',relampago:'nin'})[el]]+=2;
+mode='map';$('#log').innerHTML='';show();
+log(`🍃 Bem-vindo(a) a Konoha, <b>${esc(n)}</b>! Aos ${a} anos, você inicia a vida shinobi com o elemento ${E[el][1]} <b>${E[el][0]}</b>.`);
+log(a>=12?'Você já se formou como <b>Genin</b>. Vá à Torre do Hokage para pegar missões!':a<=10?'Você é <b>Estudante da Academia</b>. Complete quatro aulas práticas e passe no exame de graduação antes de sair da Academia.':'Você é <b>Estudante da Academia</b>. Treine e converse com Iruka para fazer o exame!','sys');
+log('Dica: clique em personagens para interagir, ou escreva livremente o que quer fazer. Missões vão de rank D a S, e os chefes só aparecem nas mais perigosas.','sys')}
+</script></body></html>
