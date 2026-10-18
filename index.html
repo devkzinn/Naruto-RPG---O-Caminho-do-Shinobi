@@ -40,7 +40,18 @@ input[type=text],input[type=number]{font:inherit;color:var(--tx);background:var(
 .el input{margin-right:6px}[hidden]{display:none!important}
 .row{display:flex;gap:8px;margin-top:8px}.row input{flex:1;min-width:0}.row>.b{flex:0 0 auto}
 @media(max-width:480px){main{padding:10px}.c{padding:10px}.row{flex-direction:column;align-items:stretch}.row>.b{width:100%}.b{padding:10px}}
-@media(max-width:640px){#log{height:100px}.category-nav{top:108px;grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){
+#log{height:104px}
+.category-nav{position:fixed;inset:auto 0 0;z-index:20;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:6px 8px calc(env(safe-area-inset-bottom,0px) + 6px);border-top:1px solid var(--bd);box-shadow:0 -8px 24px rgba(0,0,0,.28)}
+.category-tab{min-width:0;min-height:48px;padding:5px 2px;font-size:10px;line-height:1.15;white-space:normal;overflow-wrap:anywhere}
+main{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.status-meta{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 4px}
+.status-meta span{min-width:0;font-size:11px;line-height:1.25;overflow-wrap:anywhere}
+.status-meta b{font-size:9px}
+.status-attributes{grid-template-columns:repeat(5,minmax(0,1fr));gap:3px}
+.status-attributes span{min-width:0;flex-direction:column;align-items:center;gap:1px;padding:4px 2px;text-align:center}
+.status-attributes small{font-size:9px;line-height:1.1}
+}
 </style></head><body><main>
 <!-- ===== Tela de criação do personagem ===== -->
 <section id="cr">
@@ -594,7 +605,7 @@ const places=LOC_GROUPS.map(([group,keys],i)=>{const cards=keys.filter(k=>k!=S.l
 const incident=S.urgent?`<div class="world alert"><b>🚨 CHAMADO URGENTE · ${S.urgent.title}</b><br>${S.urgent.description}<br><small>Destino: ${L[S.urgent.loc][1]} · prazo: ${S.urgent.daysLeft} dia(s)</small><div class="row">${btn(S.loc==S.urgent.loc?'Atender chamado':'Partir e atender agora',S.loc==S.urgent.loc?'answerUrgent()':'goUrgent()','p')}</div></div>`:'';
 const examButton=S.rk<3?btn(`${x.nm}<small>${exok(x)?'Requisitos completos · iniciar':`Requisitos: ${exreq(x)}`}</small>`,'exam()',exok(x)?'p':'lock'):'';
 const deployment=S.assignment?`<div class="world alert"><b>📜 Designação da Hokage: ${S.assignment.title}</b><br>${S.assignment.description}<br><small>Equipe: ${S.assignment.squad.map(id=>N[id][0]).join(' e ')} · ${S.assignment.status=='active'?`etapa ${S.assignment.stage+1}/${S.assignment.stages.length}`:'apresente-se na Torre do Hokage'}</small><div class="row">${S.assignment.status=='active'?btn('Retomar operação',"mode='assignment';render()",'p'):btn(S.loc=='torre'?'Partir para a missão':'Ir à Torre do Hokage',S.loc=='torre'?'answerAssignment()':"go('torre')",'p')}</div></div>`:'';
-const tabs=[['places','📍 Lugares'],['training','🥋 Treinos'],['care','🧘 Recuperação'],['services','📜 Serviços'],['action','✍️ Ação livre']];
+const tabs=[['places','📍 Mapa'],['training','🥋 Treinos'],['care','🧘 Descanso'],['services','📜 Serviços'],['action','✍️ Ação']];
 const nav=`<nav class="category-nav" aria-label="Categorias de ações">${tabs.map(([key,label])=>`<button class="b category-tab ${mapTab==key?'cat-active':''}" aria-pressed="${mapTab==key}" onclick="mapTab='${key}';render()">${label}</button>`).join('')}</nav>`;
 let content='';
 if(mapTab=='places')content=`<h3>${L[S.loc][0]} ${L[S.loc][1]}</h3><div class="world">🌦️ ${S.season||'Primavera'} · ${S.weather||'Céu limpo'} · Reputação da vila: ${S.rep||0}/100</div><h4>Pessoas por perto</h4><div class="g">${people||'<small>Ninguém está por aqui agora.</small>'}</div><h4>Explorar locais</h4>${places}`;
