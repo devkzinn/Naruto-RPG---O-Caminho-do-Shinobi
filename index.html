@@ -33,6 +33,9 @@ input[type=text],input[type=number]{font:inherit;color:var(--tx);background:var(
 .chat-more{margin-top:8px;color:var(--mu)}.chat-more summary{width:max-content;max-width:100%;padding:6px 0;cursor:pointer;font-size:14px;font-weight:600;color:var(--tx)}
 .category-nav{position:sticky;top:140px;z-index:4;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:6px 0;background:var(--cd)}
 .category-tab{min-height:42px;padding:7px 5px;align-items:center;text-align:center}.category-tab.cat-active{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.urgent-shade{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:16px;background:rgba(12,10,8,.78);overscroll-behavior:contain;touch-action:none}
+.urgent-dialog{width:min(100%,540px);max-height:min(90dvh,720px);overflow:auto;padding:22px;background:var(--cd);color:var(--tx);border:2px solid var(--ac);border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.55);touch-action:auto}
+.urgent-dialog h2{margin:4px 0 10px;font-size:22px;line-height:1.25}.urgent-kicker{font-size:13px;font-weight:800;color:var(--ac);text-transform:uppercase}.urgent-deadline{padding:10px 12px;background:var(--bg);border-left:4px solid var(--ac);font-weight:600}
 .rk{display:inline-block;min-width:22px;text-align:center;border-radius:6px;color:#fff;font-weight:700;padding:0 5px;margin-right:6px}
 .rkD{background:#868e96}.rkC{background:#2f9e44}.rkB{background:#1c7ed6}.rkA{background:#7048e8}.rkS{background:#c92a2a}
 .el label{display:block;border:1px solid var(--bd);border-radius:10px;padding:8px;cursor:pointer}
@@ -43,7 +46,7 @@ input[type=text],input[type=number]{font:inherit;color:var(--tx);background:var(
 </style></head><body><main>
 <!-- ===== Tela de criação do personagem ===== -->
 <section id="cr">
-<h1>🍥 Naruto RPG: Caminho do Shinobi</h1>
+<h1>🍥 Naruto RPG: O Caminho do Shinobi</h1>
 <div class="c"><p>Crie seu shinobi e viva livremente em Konoha: converse, treine, duele, faça amizades, enfrente missões de rank D a S e derrote chefes lendários.</p>
 <h4>Nome</h4><input type="text" id="nm" maxlength="20" placeholder="Seu nome ninja">
 <h4>Idade</h4><input type="number" id="ag" min="6" max="40" value="12">
@@ -58,6 +61,7 @@ input[type=text],input[type=number]{font:inherit;color:var(--tx);background:var(
 <div id="log"></div>
 <div class="c" id="pn"></div>
 <div class="row"><button class="b" onclick="newg()">Novo jogo</button></div>
+<div id="urgentModal" hidden></div>
 </section>
 </main>
 <script>
@@ -342,7 +346,7 @@ function offerHokageMission(){let candidates=HOKAGE_OPS.filter(operation=>{const
 function offerNpcEvent(){if(S.day-(S.lastSocialDay||0)<2)return;const candidates=pres(S.loc).filter(id=>SOCIAL_SCENES[id]&&S.day-(S.socialCooldown?.[id]||-3)>=3);if(!candidates.length)return;const id=P(candidates);S.socialEvent={npc:id,day:S.day};S.lastSocialDay=S.day}
 function resolveSocial(index){const id=S.socialEvent?.npc,scene=SOCIAL_SCENES[id],choice=scene?.choices[index];if(!choice)return;const effect=SOCIAL_EFFECTS[choice[2]];remember(id,choice[2],choice[1],{affinity:effect.affinity,trust:effect.trust,respect:effect.respect,sharedMoments:1});if(effect.stat){const stat=effect.stat=='specialty'?N[id][5][0]:effect.stat;S[stat]=(S[stat]||0)+effect.increase}if(effect.hp)S.hp=Math.min(S.mh,S.hp+effect.hp);if(effect.chakra)S.ck=Math.min(S.mc,S.ck+effect.chakra);if(effect.fatigue)S.fatigue=Math.max(0,(S.fatigue||0)+effect.fatigue);if(effect.rep)S.rep=Math.min(100,(S.rep||0)+effect.rep);S.socialCooldown[id]=S.day;S.socialEvent=null;gain(effect.xp);log(`<b>${N[id][0]}:</b> ${choice[1]}`);log(`🤝 Afinidade +${effect.affinity}${effect.rep?` · reputação +${effect.rep}`:''}.`,'ok');render()}
 function ignoreSocial(){const id=S.socialEvent?.npc;if(!id)return;S.socialCooldown[id]=S.day;S.socialEvent=null;log(`Você decide não atender ao pedido de ${N[id][0]} agora.`,'sys');render()}
-function goUrgent(){const event=S.urgent;if(!event)return log('Não há chamado urgente ativo.','sys');S.loc=event.loc;S.pres={};log(`🚨 Você parte imediatamente para ${L[event.loc][1]} atender “${event.title}”.`,'bt');tick(1);if(S.urgent===event)answerUrgent();else{log('O prazo do chamado terminou durante o deslocamento.','bad');render()}}
+function goUrgent(){const event=S.urgent;if(!event)return log('Não há chamado urgente ativo.','sys');S.loc=event.loc;S.pres={};log(`🚨 Você parte imediatamente para ${L[event.loc][1]} atender “${event.title}”.`,'bt');answerUrgent()}
 function worldDay(){const season=SEASONS[Math.floor((S.ageDays||0)/30)%SEASONS.length];S.season=season.name;S.weather=P(season.weather);log(`🌦️ ${S.season}: ${S.weather}.`,'sys');
 if(S.socialEvent&&S.day-S.socialEvent.day>=2){S.socialCooldown[S.socialEvent.npc]=S.day;S.socialEvent=null}expirePromises();
 if(!S.assignment){
@@ -628,7 +632,7 @@ $('#st').innerHTML=`<div class="status-heading"><div><span class="status-name">$
 `<div class="status-bars">`+bar('❤️ Vida',S.hp,S.mh,'hp')+bar('💠 Chakra',S.ck,S.mc,'ck')+bar('✨ Experiência',S.xp,S.lv*40,'ac')+`</div>`+
 `<div class="status-meta"><span><b>Ryō</b><br>💰 ${S.ryo}</span><span><b>Calendário</b><br>Dia ${S.day} · ${TM[S.t]} · Ano ${1+(S.worldYears||0)}</span><span><b>Próximo aniversário</b><br>${DAYS_PER_YEAR-(S.ageDays||0)} dias</span><span><b>Missões</b><br>📜 ${S.done} concluídas</span><span><b>Equipe</b><br>🤝 ${(S.team||[]).length}/2 aliados</span><span><b>Condição</b><br>Fadiga ${S.fatigue||0}% · Reputação ${S.rep||0}</span><span><b>Equipamento</b><br>🩹 ${S.kit} kits · 💊 ${S.pill} pílulas</span></div>`+
 `<div class="status-attributes"><span><small>Ninjutsu</small><b>${S.nin}</b></span><span><small>Taijutsu</small><b>${S.tai}</b></span><span><small>Velocidade</small><b>${S.vel}</b></span><span><small>Inteligência</small><b>${S.int}</b></span><span><small>Carisma</small><b>${S.car}</b></span></div>`;
-$('#pn').innerHTML=V[mode]()}
+$('#pn').innerHTML=V[mode]();const modal=$('#urgentModal'),wasHidden=modal.hidden;modal.hidden=!S.urgent;modal.innerHTML=S.urgent?`<div class="urgent-shade"><section class="urgent-dialog" role="alertdialog" aria-modal="true" aria-labelledby="urgentTitle" tabindex="-1"><span class="urgent-kicker">Ação imediata · chamado da vila</span><h2 id="urgentTitle">${esc(S.urgent.title)}</h2><p>${esc(S.urgent.description)}</p><p class="urgent-deadline">Destino: ${esc(L[S.urgent.loc][1])} · prazo restante: ${S.urgent.daysLeft} dia(s)</p><p>O chamado exige sua atenção antes de qualquer outra atividade.</p>${btn('Partir e resolver agora','goUrgent()','p')}</section></div>`:'';['#st','#log','#pn','#gm > .row'].forEach(selector=>{$(selector).inert=!!S.urgent});document.body.style.overflow=S.urgent?'hidden':'';if(S.urgent&&wasHidden)$('#urgentModal button')?.focus()}
 
 /* ===== Bloco 10: inicialização do jogo ===== */
 $('#els').innerHTML=Object.keys(E).map((k,i)=>`<label><input type="radio" name="el" value="${k}" ${i?'':'checked'}>${E[k][1]} ${E[k][0]}</label>`).join('');
