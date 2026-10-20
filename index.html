@@ -59,6 +59,7 @@ main{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 .status-attributes span{min-width:0;flex-direction:column;align-items:center;gap:1px;padding:4px 2px;text-align:center}
 .status-attributes small{font-size:9px;line-height:1.1}
 }
+.wmap{display:block;width:100%;height:auto;max-height:72vh;background:radial-gradient(ellipse at 45% 48%,#1b2530 0%,#111820 72%);border:1px solid var(--bd);border-radius:14px;margin:8px 0;box-shadow:inset 0 0 48px rgba(0,0,0,.28)}.mz{fill:rgba(85,181,232,.035);stroke:rgba(85,181,232,.15);stroke-width:1.5;stroke-dasharray:5 7}.mz2{fill:rgba(255,113,56,.025);stroke:rgba(255,113,56,.13);stroke-width:1.5;stroke-dasharray:5 7}.mt{fill:#718092;font-size:11px;font-weight:800;letter-spacing:2px}.me{stroke:#536171;stroke-width:1.2;stroke-opacity:.22;transition:stroke-opacity .2s}.me.hl{stroke:var(--ck);stroke-width:3.5;stroke-opacity:1;stroke-dasharray:9 6;animation:route 1s linear infinite}.mn{cursor:pointer;outline:none}.mn circle{fill:#202832;stroke:#566373;stroke-width:2;transition:fill .16s,stroke .16s,stroke-width .16s}.mn:hover circle{fill:#2b3743;stroke:var(--ac);stroke-width:3}.mn:focus-visible circle{stroke:var(--ck);stroke-width:4}.mn.cur circle{fill:#9c431f;stroke:#ffb08a;stroke-width:3}.mn.lk{opacity:.48}.mn.sel circle{fill:#123144;stroke:var(--ck);stroke-width:3.5}.mn.urg circle{stroke:var(--hp);stroke-width:3;animation:pl 1.2s infinite}.mn text{text-anchor:middle;pointer-events:none}.mn .lb{font-size:9px;font-weight:600;fill:#c5cfdb;paint-order:stroke;stroke:#10151b;stroke-width:3px;stroke-linejoin:round}.mn .em{font-size:15px}.mn .bd{font-size:8px;font-weight:800;fill:#fff}.map-legend{display:flex;flex-wrap:wrap;gap:7px 14px;margin:8px 0;color:var(--mu);font-size:12px}.map-legend span{display:inline-flex;align-items:center;gap:6px}.map-dot{width:10px;height:10px;border-radius:50%;background:#26313d;border:2px solid #697789}.map-dot.current{background:var(--ac);border-color:#ffb08a}.map-dot.selected{background:#123144;border-color:var(--ck)}.map-dot.urgent{background:#361b23;border-color:var(--hp)}.map-dot.locked{opacity:.45}.map-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.map-heading small{color:var(--mu)}@keyframes pl{50%{stroke-width:6}}@keyframes route{to{stroke-dashoffset:-15}}.category-nav{grid-template-columns:repeat(6,minmax(0,1fr))!important}
 </style></head><body><main>
 <!-- ===== Tela de criação do personagem ===== -->
 <section id="cr">
@@ -191,6 +192,8 @@ haku:['Haku, espelhos de gelo',150,18,'agua',1],gato:['Mercenário de Gato',130,
 zabuza:['Zabuza Momochi, Demônio da Névoa',230,19,'agua',1],oro:['Orochimaru, o Sannin Serpente',340,24,'terra',1],kisame:['Kisame Hoshigaki, Monstro da Névoa',480,28,'agua',1],pain:['Pain, o Deus que Desce',640,34,'vento',1]};
 EN.gaaraStory=['Gaara do Deserto, rival do torneio',260,24,'terra',1];
 EN.sasukeStory=['Sasuke Uchiha, confronto no Vale do Fim',420,30,'relampago',1];
+EN.kabutoStory=['Kabuto Yakushi, espião da guerra',680,38,'agua',1];
+EN.madaraStory=['Madara Uchiha, lenda revivida',820,42,'fogo',1];
 // Missões: [rank, nome, descrição, inimigo final, ryo, xp]
 const MS=[['D','Capturar o gato Tora','A esposa do Daimyo perdeu o gato… de novo.','ladrao',60,25],
 ['D','Capinar o jardim da vila','Um serviço simples, mas algo se mexe nos arbustos.','lobo',45,20],
@@ -228,10 +231,10 @@ const STORY_ARCS=[
 {rank:'B',title:'Os espelhos de Haku',description:'Enfrente o caçador mascarado que protege Zabuza.',enemy:'haku',reward:240,xp:85,scene:['A névoa fecha a passagem e agulhas surgem de todos os lados.',[['Ler o movimento dos reflexos','int'],['Proteger Tazuna e avançar','tai'],['Localizar Haku pelo chakra','nin']]]},
 {rank:'B',title:'O Demônio da Névoa',description:'Impeça Zabuza de voltar a ameaçar a ponte.',enemy:'zabuza',reward:300,xp:110,scene:['Zabuza ergue a Kubikiribōchō e prepara um golpe devastador.',[['Manter a guarda e esperar a abertura','tai'],['Interromper a concentração com ninjutsu','nin'],['Contornar a névoa com velocidade','vel']]]}
 ]},
-{id:'chunin',title:'Arco 2 · Exame Chunin',summary:'Provas, rivais, sobrevivência e o torneio.',unlock:{rank:1,level:6,missions:3},consequence:'Seu nome entra nos registros do Exame Chunin; os rivais sobreviventes lembram suas decisões.',missions:[
-{rank:'C',title:'Sobrevivência na Floresta da Morte',description:'Recupere o pergaminho e mantenha sua equipe unida.',goal:'retrieve',reward:220,xp:75,scene:['O pergaminho está perto de uma armadilha; rastros rivais se aproximam.',[['Desarmar a armadilha antes de tocar no pergaminho','int'],['Mandar um aliado vigiar a trilha','car'],['Localizar o selo com chakra','nin']]]},
-{rank:'B',title:'Rival do Som',description:'Enfrente um dos ninjas que ameaçou os participantes do exame.',enemy:'dosu',reward:260,xp:90,scene:['Dosu ajusta o amplificador no braço e escuta seus passos.',[['Mudar o ritmo para confundir a leitura sonora','vel'],['Quebrar o amplificador com um golpe preciso','tai'],['Manter distância e concentrar chakra','nin']]]},
-{rank:'A',title:'A final do torneio',description:'O confronto decisivo testa seu preparo e sua determinação.',enemy:'gaaraStory',reward:360,xp:130,scene:['Gaara cobre o corpo com areia e aguarda seu primeiro movimento.',[['Observar como a areia reage','int'],['Forçar uma abertura com taijutsu','tai'],['Usar uma técnica para romper a defesa','nin']]]}
+{id:'kazekage',title:'Arco 2 · Resgate do Kazekage',summary:'Resgate Gaara e enfrente a ameaça da Akatsuki.',unlock:{rank:2,level:8,missions:6},consequence:'Gaara retorna a Suna e a aliança entre as vilas se fortalece.',missions:[
+{rank:'A',title:'Rastro da Akatsuki',description:'Siga os rastros dos sequestradores até o esconderijo.',goal:'retrieve',reward:420,xp:145,scene:['Marcas de chakra levam a uma trilha estreita na fronteira.',[['Analisar os rastros antes de avançar','int'],['Seguir o grupo sem ser visto','vel'],['Pedir que a equipe vigie as rotas','car']]]},
+{rank:'A',title:'A arte da explosão',description:'Impeça Deidara de fugir com o Kazekage.',enemy:'deidara',reward:520,xp:180,scene:['Deidara sobrevoa o esconderijo enquanto prepara argila explosiva.',[['Acompanhar o padrão das explosões','int'],['Aproximar-se antes que ele decole','vel'],['Proteger os aliados do impacto','tai']]]},
+{rank:'S',title:'O esconderijo das marionetes',description:'Derrote Sasori e liberte Gaara.',enemy:'sasori',reward:680,xp:230,scene:['Sasori revela suas marionetes e bloqueia a passagem até Gaara.',[['Observar os fios que controlam as marionetes','int'],['Destruir as armas com um ataque preciso','tai'],['Procurar uma abertura com ninjutsu','nin']]]}
 ]},
 {id:'sasuke',title:'Arco 3 · Resgate de Sasuke',summary:'Montagem da equipe, perseguição e confrontos em sequência.',unlock:{rank:2,level:12,missions:8},consequence:'Sasuke não desaparece da história: o desfecho do Vale do Fim fica registrado permanentemente.',missions:[
 {rank:'B',title:'Rastrear o grupo do Som',description:'Encontre os rastros da equipe que levou Sasuke.',goal:'rescue',reward:320,xp:110,scene:['Marcas de sandálias e chakra se dividem perto da fronteira.',[['Seguir o rastro mais recente','vel'],['Pedir que a equipe cubra as rotas laterais','car'],['Ler os resíduos de chakra','nin']]]},
@@ -243,6 +246,16 @@ const STORY_ARCS=[
 {rank:'A',title:'Sinais da Akatsuki',description:'Intercepte o membro da Akatsuki que ronda as fronteiras.',enemy:'kisame',reward:620,xp:220,scene:['A Samehada absorve chakra enquanto Kisame bloqueia a estrada.',[['Avisar os aliados e proteger a retaguarda','car'],['Forçar o inimigo a sair da água','tai'],['Desestabilizar o fluxo da espada com chakra','nin']]]},
 {rank:'S',title:'Evacuação de Konoha',description:'Retire civis e proteja os aliados durante o ataque à vila.',goal:'protect',reward:700,xp:250,scene:['Destroços bloqueiam a rua; moradores e ninjas feridos precisam de saída.',[['Organizar uma rota segura para os civis','int'],['Carregar os feridos enquanto a equipe cobre a rua','tai'],['Abrir uma passagem por cima dos telhados','vel']]]},
 {rank:'S',title:'A batalha contra Pain',description:'Defenda Konoha e impeça que Pain ataque novamente.',enemy:'pain',reward:900,xp:320,scene:['Pain observa a vila e prepara uma técnica de grande alcance.',[['Avisar todos para se protegerem','car'],['Interromper a concentração antes da explosão','nin'],['Esperar o momento certo para contra-atacar','int']]]}
+]},
+{id:'cincokage',title:'Arco 5 · Cúpula dos Cinco Kage',summary:'Investigue a tensão entre as vilas e enfrente a ameaça da Raiz.',unlock:{rank:3,level:22,missions:26},consequence:'A conspiração de Danzō é revelada e as vilas reforçam sua aliança.',missions:[
+{rank:'A',title:'Rumores na fronteira',description:'Investigue os sinais de uma conspiração contra a aliança das vilas.',goal:'retrieve',reward:720,xp:250,scene:['Documentos codificados foram vistos perto de uma rota diplomática.',[['Comparar os símbolos com registros da vila','int'],['Rastrear quem transportou os documentos','vel'],['Convencer os guardas a compartilhar informações','car']]]},
+{rank:'S',title:'O líder da Raiz',description:'Interrompa os planos de Danzō antes que a cúpula seja atacada.',enemy:'danzo',reward:900,xp:310,scene:['Danzō protege o braço selado e tenta ganhar tempo.',[['Identificar os selos antes de atacar','int'],['Pressionar sem lhe dar espaço','tai'],['Desviar dos ataques e buscar uma abertura','vel']]]},
+{rank:'S',title:'A máscara por trás da crise',description:'Enfrente Tobi e proteja os representantes das vilas.',enemy:'obito',reward:1050,xp:360,scene:['Tobi surge entre os guardas e distorce o espaço ao redor.',[['Observar o intervalo entre suas aparições','int'],['Coordenar os aliados para cercá-lo','car'],['Atacar no instante em que se materializa','vel']]]}
+]},
+{id:'guerra',title:'Arco 6 · Quarta Grande Guerra Ninja',summary:'Una os esquadrões aliados e enfrente os últimos adversários.',unlock:{rank:3,level:26,missions:32},consequence:'A guerra termina e os shinobi das cinco nações iniciam uma nova era de cooperação.',missions:[
+{rank:'S',title:'Mobilização da Aliança',description:'Organize a comunicação entre os esquadrões antes do avanço inimigo.',goal:'protect',reward:900,xp:320,scene:['Mensagens contraditórias chegam de três frentes ao mesmo tempo.',[['Confirmar os relatos antes de redistribuir as equipes','int'],['Enviar reforços para proteger os feridos','tai'],['Estabelecer um sinal comum entre os esquadrões','car']]]},
+{rank:'S',title:'O exército reanimado',description:'Encontre e detenha Kabuto, que controla as forças reanimadas.',enemy:'kabutoStory',reward:1150,xp:390,scene:['Kabuto prepara uma técnica que ameaça os combatentes feridos.',[['Interromper os selos de controle','nin'],['Afastar os aliados antes da técnica','car'],['Atacar durante a preparação','vel']]]},
+{rank:'S',title:'A lenda do campo de batalha',description:'Impeça Madara de romper as linhas da Aliança Shinobi.',enemy:'madaraStory',reward:1400,xp:470,scene:['Madara avança sozinho, confiante de que nenhum esquadrão pode detê-lo.',[['Coordenar os ataques da Aliança','car'],['Estudar o ritmo de suas técnicas','int'],['Avançar junto dos aliados para pressioná-lo','tai']]]}
 ]}
 ];
 // Objetivos finais sem combate: cada opção testa uma habilidade diferente.
@@ -407,7 +420,7 @@ const DAYS_PER_YEAR=120;
 const ACADEMY_CLASS_COUNT=4;
 const academyStudent=()=>S.rk===0;
 const academyComplete=()=>((S.academySessions||0)>=ACADEMY_CLASS_COUNT);
-const fresh=(n,a,el)=>({n,a,el,style:'Equilibrado',power:'Regular',lv:1,xp:0,hp:60,mh:60,ck:30,mc:30,ryo:100,day:1,t:0,ageDays:0,worldYears:0,season:'Primavera',weather:'Céu limpo',urgent:null,lastUrgent:'',lastAssignmentDay:0,lastAssignmentId:'',assignment:null,socialEvent:null,socialCooldown:{},lastSocialDay:0,bonds:{},promises:{},rep:0,team:[],loc:'academia',rk:a>=12?1:0,academySessions:0,fatigue:0,practice:{},chat:{},nin:5,tai:5,vel:5,int:5,car:5,rel:{},love:{},rs:{},partner:null,done:0,jt:[el+':0'],ms:{},kit:1,pill:1,got:{},cd:{},duels:{},pres:{}});
+const fresh=(n,a,el)=>({n,a,el,style:'Equilibrado',combatStyle:'Equilibrado',styles:['Equilibrado'],power:'Regular',lv:1,xp:0,hp:60,mh:60,ck:30,mc:30,ryo:100,day:1,t:0,ageDays:0,worldYears:0,season:'Primavera',weather:'Céu limpo',urgent:null,lastUrgent:'',lastAssignmentDay:0,lastAssignmentId:'',assignment:null,activeContract:null,socialEvent:null,socialCooldown:{},lastSocialDay:0,bonds:{},promises:{},rep:0,team:[],loc:'academia',rk:a>=12?1:0,academySessions:0,fatigue:0,practice:{},chat:{},nin:5,tai:5,vel:5,int:5,car:5,rel:{},love:{},rs:{},partner:null,done:0,jt:[el+':0'],ms:{},kit:1,pill:1,got:{},cd:{},duels:{},pres:{}});
 const ageOf=id=>(NA[id]||20)+(S.worldYears||0);
 const save=()=>{try{localStorage.setItem(SV,JSON.stringify(S))}catch(e){}};
 const ld=()=>{try{return JSON.parse(localStorage.getItem(SV)||localStorage.getItem('naruto-rpg-v1'))}catch(e){return null}};
@@ -424,7 +437,7 @@ function log(h,c=''){const d=document.createElement('p');d.className=c;d.innerHT
 function recordWorldEvent(kind,title,detail){S.worldEvents=Array.isArray(S.worldEvents)?S.worldEvents:[];const event={day:S.day,kind,title,detail};S.worldEvents.push(event);S.worldEvents=S.worldEvents.slice(-12);save();return event}
 function recentWorldEvent(){return(S.worldEvents||[]).at(-1)||null}
 function reactToWorldEvent(id,n){const event=recentWorldEvent();if(!event||S.day-event.day>14)return;const w=ew();w.heard=w.heard||{};const eventKey=`${event.day}:${event.kind}:${event.title}`;if(w.heard[id]==eventKey||Math.random()>=.45)return;w.heard[id]=eventKey;const line=event.kind=='failure'?`Soube do que aconteceu em “${event.title}”. A equipe ainda precisa de ajuda.`:event.kind=='rescue'?`Ouvi que você resgatou um aliado em “${event.title}”. Isso importa para a vila.`:event.kind=='civilians'?`Os moradores comentam que você protegeu civis em “${event.title}”.`: `A vila está comentando sua missão “${event.title}”.`;log(`<b>${n[0]}:</b> “${line}”`,'sys')}
-function offerHokageMission(){let candidates=HOKAGE_OPS.filter(operation=>{const req=LOC_REQ[operation.loc];return S.rk>=NEED[operation.rank]&&(S.rep||0)>=(REP_REQ[operation.rank]||0)&&(!req||(S.rk>=req.rk&&S.done>=req.done))});if(candidates.length>1)candidates=candidates.filter(operation=>operation.id!=S.lastAssignmentId);if(!candidates.length)return;const operation=P(candidates),squad=examSquad();S.assignment={...operation,status:'offered',stage:0,successes:0,failures:0,squad};S.lastAssignmentDay=S.day;S.lastAssignmentId=operation.id;log(`📜 <b>Tsunade designou você e ${squad.map(id=>N[id][0]).join(' e ')} para ${operation.title}.</b> Apresente-se na Torre do Hokage para partir.`,'bt')}
+function offerHokageMission(){let candidates=HOKAGE_OPS.filter(operation=>{const req=LOC_REQ[operation.loc];return S.rk>=NEED[operation.rank]&&(S.rep||0)>=(REP_REQ[operation.rank]||0)&&(!req||(S.rk>=req.rk&&S.done>=req.done))});if(candidates.length>1)candidates=candidates.filter(operation=>operation.id!=S.lastAssignmentId);if(!candidates.length)return;const operation=P(candidates),squad=examSquad();S.assignment={...operation,status:'offered',stage:0,phase:0,successes:0,failures:0,preparationSuccesses:0,squad};S.lastAssignmentDay=S.day;S.lastAssignmentId=operation.id;log(`📜 <b>Tsunade designou você e ${squad.map(id=>N[id][0]).join(' e ')} para ${operation.title}.</b> Apresente-se na Torre do Hokage para partir.`,'bt')}
 function offerNpcEvent(){if(S.day-(S.lastSocialDay||0)<2)return;const candidates=pres(S.loc).filter(id=>SOCIAL_SCENES[id]&&S.day-(S.socialCooldown?.[id]||-3)>=3);if(!candidates.length)return;const id=P(candidates);S.socialEvent={npc:id,day:S.day};S.lastSocialDay=S.day}
 function resolveSocial(index){const id=S.socialEvent?.npc,scene=SOCIAL_SCENES[id],choice=scene?.choices[index];if(!choice)return;const effect=SOCIAL_EFFECTS[choice[2]];remember(id,choice[2],choice[1],{affinity:effect.affinity,trust:effect.trust,respect:effect.respect,sharedMoments:1});if(effect.stat){const stat=effect.stat=='specialty'?N[id][5][0]:effect.stat;addStat(stat,effect.increase)}if(effect.hp)S.hp=Math.min(S.mh,S.hp+effect.hp);if(effect.chakra)S.ck=Math.min(S.mc,S.ck+effect.chakra);if(effect.fatigue)S.fatigue=Math.max(0,(S.fatigue||0)+effect.fatigue);if(effect.rep)if((S.rep||0)<12)S.rep=Math.min(12,(S.rep||0)+effect.rep*.25);S.socialCooldown[id]=S.day;S.socialEvent=null;gain(effect.xp);log(`<b>${N[id][0]}:</b> ${choice[1]}`);log(`🤝 Afinidade +${effect.affinity}${effect.rep?` · reputação +${effect.rep}`:''}.`,'ok');render()}
 function ignoreSocial(){const id=S.socialEvent?.npc;if(!id)return;S.socialCooldown[id]=S.day;S.socialEvent=null;log(`Você decide não atender ao pedido de ${N[id][0]} agora.`,'sys');render()}
@@ -438,7 +451,7 @@ render()}
 function missUrgent(event){const ignored=event.response=='ignored',penalty=ignored?4:2;S.rep=Math.max(0,(S.rep||0)-penalty);if(event.npc){rel(event.npc,-penalty);if(MORTAL.includes(event.npc)&&MSK.indexOf(event.rank)>=2)hurtNpc(event.npc,false)}S.urgent=null;log(ignored?`⌛ “${event.title}” evoluiu sem intervenção. A vila perdeu ${penalty} de reputação e ${event.npc?N[event.npc][0]+' perdeu confiança em você.':''}`:`⌛ “${event.title}” passou sem atendimento. A vila perdeu ${penalty} de reputação.`,'bad')}
 function worldDay(){const season=SEASONS[Math.floor((S.ageDays||0)/30)%SEASONS.length];S.season=season.name;S.weather=P(season.weather);log(`🌦️ ${S.season}: ${S.weather}.`,'sys');
 if(S.socialEvent&&S.day-S.socialEvent.day>=2){S.socialCooldown[S.socialEvent.npc]=S.day;S.socialEvent=null}expirePromises();
-if(!S.assignment){const activityBusy=!!(M||B||X);
+if(!S.assignment){const activityBusy=!!(S.activeContract||M||B||X);
 if(!activityBusy){
 if(S.urgent){S.urgent.daysLeft--;if(S.urgent.daysLeft<=0)missUrgent(S.urgent)}
 if(!S.urgent){const candidates=CRISES.filter(event=>MSK.indexOf(event.rank)>=MSK.indexOf('B')&&event.id!=S.lastUrgent&&S.rk>=NEED[event.rank]&&(()=>{const req=LOC_REQ[event.loc];return !req||(S.rk>=req.rk&&S.done>=req.done)})());const chance=S.weather=='Tempestade'?.32:S.weather=='Chuva forte'?.24:.13;if(candidates.length&&Math.random()<chance){const event=P(candidates);S.urgent={...event,daysLeft:3};S.lastUrgent=event.id;log(`🚨 Chamado urgente em ${L[event.loc][1]}: <b>${event.title}</b>. Você tem três dias para chegar e ajudar.`,'bt')}}
@@ -449,7 +462,7 @@ function tick0(n=1){for(let step=0;step<n;step++){S.t++;let newDay=false;if(S.t>
 function gain(x){S.xp+=x;while(S.xp>=S.lv*40){S.xp-=S.lv*40;S.lv++;S.mh+=10;S.mc+=6;S.hp=S.mh;S.ck=S.mc;addStat(P(AT),1);addStat(P(AT),1);log(`⬆️ <b>Nível ${S.lv}!</b> Seus atributos aumentaram.`,'ok');if(S.lv==4||S.lv==8)learn(S.el+':'+(S.lv==4?1:2),1)}}
 function learn(k,v){if(S.jt.includes(k))return;S.jt.push(k);if(v){const[e,i]=k.split(':');log(`✨ Novo jutsu: <b>${E[e][3][i]}</b>!`,'ok')}}
 function pres(l){if(!S.pres[l]){const p=L[l][2],f=['academia','ichiraku','torre'].includes(l)?[p[0]]:[],r=p.filter(x=>!f.includes(x)).sort(()=>Math.random()-.5);S.pres[l]=f.concat(r).slice(0,S.t==2?2:3)}return S.pres[l]}  // à noite há menos gente na rua
-function go(k){if(academyStudent()&&k!='academia'){log('📚 Você ainda não se formou. Iruka pede que conclua as aulas e o exame antes de sair da Academia.','sys');return render()}const req=LOC_REQ[k];if(req&&(S.rk<req.rk||S.done<req.done)){log(`🔒 Acesso bloqueado. Requer rank ${RK[req.rk]} e ${req.done} missões concluídas.`,'sys');return render()}S.loc=k;tick(1);mode='map';log(`🚶 Você segue para <b>${L[k][1]}</b>.`,'sys');if(Math.random()<.25)ev();render()}
+function go(k){if(!L[k])return log('Esse destino não existe no mapa.','sys');if(academyStudent()&&k!='academia'){log('📚 Você ainda não se formou. Iruka pede que conclua as aulas e o exame antes de sair da Academia.','sys');return render()}const req=LOC_REQ[k];if(req&&(S.rk<req.rk||S.done<req.done)){log(`🔒 Acesso bloqueado. Requer rank ${RK[req.rk]} e ${req.done} missões concluídas.`,'sys');return render()}S.loc=k;tick(1);mode='map';log(`🚶 Você segue para <b>${L[k][1]}</b>.`,'sys');if(Math.random()<.25)ev();render()}
 function ev(){const r=R(1,6);if(r==1){const y=R(10,40);S.ryo+=y;log(`💰 Você encontra ${y} ryo no chão!`)}else if(r==2){const foe=S.loc=='onda'||S.loc=='ponte'?'gato':S.loc=='som'?'dosu':S.loc=='akatsuki'?'obito':P(['ladrao','lobo','renegado']);log('⚠️ Um inimigo aparece no caminho!','bad');fight(EN[foe],{})}else if(r==3)log(P(['🗣️ Ouve rumores sobre movimentações da Akatsuki.','🗣️ Dizem que Naruto devorou 12 tigelas de ramen hoje.','🗣️ Um mercador comenta que a Hokage busca novos ninjas.']),'sys');else if(r==4){gain(6);log('🥷 Um ninja de passagem corrige sua postura. (+6 XP)')}else if(r==5){const witnesses=pres(S.loc);if(witnesses.length){const id=P(witnesses);rel(id,2);log(`🤝 Você ajuda ${N[id][0]} com uma tarefa simples. A confiança entre vocês aumenta.`,'ok')}else log('🍃 O vento muda e nuvens escuras se acumulam no horizonte.','sys')}else{const damage=R(4,10);S.hp=Math.max(1,S.hp-damage);log(`🌧️ O terreno escorregadio causa uma queda. Você perde ${damage} HP.`,'bad')}}
 function academyClass(){if(!academyStudent()||S.loc!='academia')return;if(academyComplete())return log('🎓 Você já concluiu as quatro aulas práticas. Faça o exame de graduação.','sys');S.academySessions=(S.academySessions||0)+1;S.ck=Math.min(S.mc,S.ck+8);gain(12);rel('iruka',2);log(`📚 Aula ${S.academySessions}/${ACADEMY_CLASS_COUNT} concluída: você pratica controle de chakra, técnicas básicas e trabalho em equipe. +12 XP.`,'ok');if(academyComplete())log('🎓 Iruka libera você para o exame de graduação. Prepare-se e vença o examinador!','bt');tick(1);render()}
 function self(k){
@@ -497,7 +510,7 @@ function toggleTeam(id){S.team=S.team||[];if((S.rel[id]||0)<20)return log(`<b>${
 function prac0(k){if((S.fatigue||0)>=70)return log('Você está exausto. Medite ou descanse antes de praticar jutsu.','sys');const c=jc(k);if(S.ck<c)return log('Chakra insuficiente para praticar.','sys');S.ck-=c;S.fatigue=Math.min(100,(S.fatigue||0)+15);const b=mlv(k);S.ms[k]=(S.ms[k]||0)+4;gain(6);log(`🎯 Você pratica ${jn(k)}.${mlv(k)>b?` ⭐ <b>Maestria ${mlv(k)}!</b>`:''}`,'ok');tick(1);render()}
 
 /* ===== Bloco 5: social, relacionamento e romance ===== */
-const rel=(id,v)=>{S.rel[id]=(S.rel[id]||0)+v};
+const rel=(id,v)=>{S.rel=S.rel||{};S.rel[id]=Math.max(-100,Math.min(100,(S.rel[id]||0)+v))};
 function bondOf(id){S.bonds=S.bonds||{};const bond=S.bonds[id]||(S.bonds[id]={});['trust','respect','rivalry','mentorship','sharedMissions','sharedMoments','dates'].forEach(key=>{if(!Number.isFinite(bond[key]))bond[key]=0});bond.events=Array.isArray(bond.events)?bond.events:[];return bond}
 function remember(id,type,detail,change={}){const bond=bondOf(id);if(change.affinity)rel(id,change.affinity);['trust','respect','rivalry','mentorship','sharedMissions','sharedMoments','dates'].forEach(key=>{if(change[key])bond[key]=(bond[key]||0)+change[key]});bond.events.push({day:S.day,type,detail});bond.events=bond.events.slice(-5);return bond}
 function bondLabel(id){const bond=bondOf(id);if(S.rs[id]=='couple'&&rom(id))return 'Relacionamento';if((S.team||[]).includes(id))return 'Equipe shinobi';if(bond.rivalry>=2)return 'Rivalidade';if(bond.mentorship>0)return 'Mestre e aprendiz';if(bond.sharedMissions>0)return 'Companheiros de missão';if(bond.trust>=6)return 'Amizade próxima';if(bond.trust>=2)return 'Amizade';return 'Conhecidos'}
@@ -630,7 +643,7 @@ render()}
 /* ===== Bloco 7: combate e sistema de batalha ===== */
 function fight(e,o){B={n:e[0],hp:e[1],mx:e[1],atk:e[2],el:e[3],boss:e[4],pattern:bossPattern(e[0]),o:o||{},df:0,tn:0,ch:0,ph:0,team:(X?.squad||S.team||[]).slice(),teamUsed:false,burnTurns:0,burnDamage:0,stunTurns:0,slowTurns:0,wallTurns:0,open:0};mode='battle';log(B.boss?`👹 <b>CHEFE: ${B.n}</b> surge diante de você!`:`⚔️ <b>${B.n}</b> ${B.el?E[B.el][1]:''} entra em combate!`,'bt');render()}
 function winBattle(){const o=B.o,boss=B.boss;log(`🏆 <b>${B.n}</b> foi derrotado!`,'ok');B=null;mode='map';gain(o.sp?12:18);o.win&&o.win();if(boss){S.kit++;S.pill++;log('🎁 O chefe deixa suprimentos: +1 kit médico e +1 pílula.','ok')}render()}
-function loseBattle(){const duelId=B?.o?.duelId,sp=B?.o?.sp,failedMission=M?.m;B=null;mode='map';if(duelId){const duel=S.duels?.[duelId]||{day:S.day,wins:0,losses:0};const repeat=(duel.wins||0)+(duel.losses||0);const xp=Math.max(1,4-repeat);S.duels[duelId]={...duel,day:S.day,losses:(duel.losses||0)+1};gain(xp);remember(duelId,'duelo','Você perdeu o duelo amistoso, mas aprendeu algo.',{affinity:Math.max(0,2-repeat),respect:Math.max(0,1-repeat)});log(`📉 ${N[duelId][0]} venceu o duelo. +${xp} XP de experiência.`,'sys')}if(sp){S.hp=1;gain(6);if(X){X=null;S.cd.ex=S.day;log('❌ Você foi eliminado do exame. Tente de novo amanhã.','bad')}log('😮‍💨 Você perdeu o duelo, mas aprendeu algo.')}else{if(failedMission)recordWorldEvent('failure',failedMission[1],'A missão terminou em retirada após o jogador ser derrotado.');S.hp=Math.ceil(S.mh/2);S.ryo=Math.floor(S.ryo*.8);S.loc='hospital';M=null;S.pres={};log('😵 Você desmaiou e acorda no hospital. Perdeu parte dos ryo.','bad');tick(3)}}
+function loseBattle(){const duelId=B?.o?.duelId,sp=B?.o?.sp,failedMission=M?.m;B=null;mode='map';if(duelId){const duel=S.duels?.[duelId]||{day:S.day,wins:0,losses:0};const repeat=(duel.wins||0)+(duel.losses||0);const xp=Math.max(1,4-repeat);S.duels[duelId]={...duel,day:S.day,losses:(duel.losses||0)+1};gain(xp);remember(duelId,'duelo','Você perdeu o duelo amistoso, mas aprendeu algo.',{affinity:Math.max(0,2-repeat),respect:Math.max(0,1-repeat)});log(`📉 ${N[duelId][0]} venceu o duelo. +${xp} XP de experiência.`,'sys')}if(sp){S.hp=1;gain(6);if(X){X=null;S.cd.ex=S.day;log('❌ Você foi eliminado do exame. Tente de novo amanhã.','bad')}log('😮‍💨 Você perdeu o duelo, mas aprendeu algo.')}else{if(failedMission)recordWorldEvent('failure',failedMission[1],'A missão terminou em retirada após o jogador ser derrotado.');S.activeContract=null;S.hp=Math.ceil(S.mh/2);S.ryo=Math.floor(S.ryo*.8);S.loc='hospital';M=null;S.pres={};log('😵 Você desmaiou e acorda no hospital. Perdeu parte dos ryo.','bad');tick(3)}}
 function act(t,i){let d=0,m='';
 if(t=='tai'){const critChance=Math.min(30,10+S.vel*.5);const c=Math.random()*100<critChance;d=Math.round((5+S.tai*1.6)*R(8,12)/10*(c?1.8:1));m=`👊 ${c?'<b>Golpe crítico!</b> ':'Você acerta: '}<b>${d}</b> de dano.`}
 else if(t=='jut'){const[e,ti]=i.split(':'),effect=JUTSU_EFFECTS[i],c=jc(i);if(S.ck<c)return log('Chakra insuficiente!','sys');S.ck-=c;const x=mu(e,B.el),b=mlv(i),base=(4+S.nin*1.7)*[1.5,2.1,2.9][+ti]*(1+.12*b)*x,variance=R(9,11)/10;d=effect?.type=='multi'?Math.round(base*.43*variance)*3:Math.round(base*(effect?.type=='surge'?1.25:1)*variance);let effectText='';
@@ -672,48 +685,160 @@ lee:{success:['Excelente trabalho em equipe! Vamos manter o ritmo, sem esquecer 
 hinata:{success:['Fico feliz que todos estejam bem. Vamos continuar apoiando uns aos outros.','Sua decisão deu confiança à equipe. Posso ajudar na próxima etapa.'],setback:['Tudo bem, ainda podemos nos reorganizar. Não precisa enfrentar isso sozinho.','Vou ficar ao seu lado enquanto encontramos uma forma mais segura.']}
 };
 function missionBanter(team,success,title,approach){(team||[]).forEach(id=>remember(id,'missao',`Em “${title}”, a equipe tentou: ${approach}.`,{affinity:success?1:-1,trust:success?2:-1,respect:success?1:0,sharedMissions:1}));const id=(team||[]).find(member=>MISSION_BANTER[member]);if(!id)return;const line=P(MISSION_BANTER[id][success?'success':'setback']).replace('{title}',esc(title));log(`<b>${N[id][0]}:</b> “${line}” <small>(${esc(approach)})</small>`,success?'sys':'bad')}
+const MISSION_ROUTINES={
+escort:[
+['Antes da partida, como você organiza a escolta?',[['Definir uma formação que proteja a carga','int'],['Vistoriar a rota e os pontos de parada','vel'],['Combinar sinais com os passageiros','car']]],
+['A escolta encontra um obstáculo no caminho. Como avança?',[['Abrir passagem mantendo a carga protegida','tai'],['Procurar um desvio seguro','int'],['Enviar um batedor para verificar a frente','vel']]],
+['Ao anoitecer, como prepara o acampamento da equipe?',[['Montar turnos de vigia','int'],['Reforçar o perímetro da carroça','tai'],['Acalmar os passageiros e dividir tarefas','car']]]
+],
+rescue:[
+['Antes de entrar na área, o que você prepara?',[['Marcar uma rota de retirada','int'],['Localizar sinais de chakra dos desaparecidos','nin'],['Reunir a equipe e dividir funções','car']]],
+['Você encontra uma pista perto de uma zona perigosa. Como prossegue?',[['Seguir os rastros sem deixar marcas','vel'],['Abrir caminho para alcançar os feridos','tai'],['Confirmar se há aliados por perto','nin']]],
+['Um resgatado precisa de cuidados antes da viagem. O que faz?',[['Estabilizar os ferimentos e poupar forças','int','heal'],['Carregá-lo enquanto a equipe cobre a retaguarda','tai'],['Organizar o retorno pelo caminho mais curto','vel']]]
+],
+retrieve:[
+['Como começa a busca pelo item ou informação?',[['Comparar os relatos e mapear a área','int'],['Procurar resíduos de chakra','nin'],['Perguntar aos moradores próximos','car']]],
+['A pista leva a um terreno cheio de armadilhas. Como investiga?',[['Examinar o chão antes de avançar','int'],['Desarmar o mecanismo com chakra','nin'],['Observar a área de um ponto elevado','vel']]],
+['Você encontrou o que procurava. Como protege a descoberta?',[['Guardar o item e registrar sua localização','int'],['Criar uma rota de retirada discreta','vel'],['Revezar a vigia enquanto a equipe descansa','tai','rest']]]
+],
+protect:[
+['Como organiza a defesa antes que a ameaça chegue?',[['Definir posições e setores de vigilância','int'],['Reforçar a linha de proteção','tai'],['Acalmar e orientar as pessoas protegidas','car']]],
+['A ameaça tenta separar o grupo. Qual é sua resposta?',[['Manter os protegidos no centro da formação','tai'],['Conduzi-los por uma rota alternativa','vel'],['Coordenar a equipe para cobrir os flancos','car']]],
+['A noite chega e a proteção continua. O que prioriza?',[['Revezar a guarda para evitar distrações','int'],['Fortalecer as barreiras ao redor do abrigo','nin'],['Ajudar os protegidos a descansar em segurança','car','rest']]]
+],
+deliver:[
+['Como prepara a entrega antes de sair?',[['Conferir a encomenda e proteger o conteúdo','int'],['Escolher o caminho mais rápido','vel'],['Confirmar o destino e avisar quem espera','car']]],
+['O trajeto está bloqueado. Como mantém a entrega no prazo?',[['Encontrar um desvio sem expor a carga','int'],['Atravessar antes que o bloqueio piore','vel'],['Pedir orientação a quem conhece a região','car']]],
+['Você precisa passar a noite antes de chegar ao destino. Como cuida da carga?',[['Guardar a encomenda em local seco e seguro','int'],['Fazer uma vigília perto dos suprimentos','tai'],['Descansar para estar pronto para a etapa final','car','rest']]]
+],
+combat:[
+['Antes do confronto, como você se prepara?',[['Estudar o terreno e prever rotas de fuga','int'],['Reunir a equipe e combinar sinais','car'],['Treinar uma abertura para o primeiro ataque','tai']]],
+['O inimigo muda de posição durante a operação. Como reage?',[['Acompanhar seus movimentos sem se expor','vel'],['Interromper seu avanço com taijutsu','tai'],['Ler o fluxo de chakra e antecipar a técnica','nin']]],
+['Após um dia de combate, como se prepara para continuar?',[['Tratar ferimentos e recuperar o fôlego','int','heal'],['Repor chakra com uma pausa controlada','nin','chakra'],['Montar guarda enquanto os aliados descansam','tai']]]
+]
+};
+const MISSION_ROUTINE_PHASES=['Planejamento da manhã','Ação em campo','Rotina da noite'];
+function missionStyle(mission){
+const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),title=normalize(mission[1]),description=normalize(mission[2]),context=`${title} ${description}`,goal=mission[6];
+if(goal&&MISSION_ROUTINES[goal])return goal;
+if(/resgat|socorr|desaparecid|ferido|sequestrad/.test(title))return'rescue';
+if(/proteg|defesa|vigilia|guard|civis|evacu|jardim|capinar/.test(title))return'protect';
+if(/escolt|comboio|caravana|suprimento|construtor/.test(title))return'escort';
+if(/entreg|mensagem|mensageiro|levar/.test(title))return'deliver';
+if(/document|pergaminho|investig|rastro|recuper|buscar|busca|pista|captur|procur|perdid|espiao|patrulh|rastre/.test(title))return'retrieve';
+if(/resgat|socorr|desaparecid|ferido|sequestrad/.test(description))return'rescue';
+if(/proteg|defesa|vigilia|guard|civis|evacu|jardim|capinar/.test(description))return'protect';
+if(/escolt|comboio|caravana|suprimento|construtor/.test(description))return'escort';
+if(/entreg|mensagem|mensageiro|levar/.test(description))return'deliver';
+if(/document|pergaminho|investig|rastro|recuper|buscar|busca|pista|captur|procur|perdid|espiao|patrulh|rastre/.test(context))return'retrieve';
+return mission[3]?'combat':'deliver'
+}
+function missionDays(rank){return({D:2,C:2,B:3,A:4,S:5})[rank]||2}
+function beginMultiDayMission(mission,index=-1,story=null,scene=null){
+if(S.activeContract||M||B||S.assignment?.status=='active')return log('Conclua ou retome a missão atual antes de iniciar outra.','sys');
+const contract={mission:mission.slice(),index,story,scene,status:'routine',style:missionStyle(mission),day:1,days:missionDays(mission[0]),phase:0,successes:0,failures:0,secondaryObjectives:0,preparationSuccesses:0};
+S.activeContract=contract;mode='contract';
+log(`📜 <b>${mission[1]}</b> começa como uma operação de ${contract.days} dias. Cada dia exige planejamento, ação em campo e uma rotina noturna.`,'bt');
+if(S.t)tick(3-S.t);
+render()
+}
+function resumeMultiDayMission(){
+const contract=S.activeContract;if(!contract)return;
+if(contract.status=='final'){
+const mission=contract.mission,stage=MSK.indexOf(mission[0]),n=contract.index>=0?2+stage:1;
+M={m:mission,i:contract.index,s:contract.finalS||0,n,failures:contract.failures||0,successes:contract.successes||0,secondaryObjectives:contract.secondaryObjectives||0,preparationSuccesses:contract.preparationSuccesses||0,step:contract.scene,story:contract.story||null};
+return nx()
+}
+mode='contract';render()
+}
+function missionRoutinePick(index){
+const contract=S.activeContract;if(!contract||contract.status!='routine')return;
+const scene=MISSION_ROUTINES[contract.style][contract.phase],choice=scene?.[1][index];if(!choice)return;
+const rank=MSK.indexOf(contract.mission[0]),bonus=teamBonus(choice[1]),styleBonus=styleTestBonus(choice[1]),dc=Math.max(9,12+rank*2-Math.floor((S.rep||0)/30)),roll=R(1,20),total=roll+S[choice[1]]+bonus+styleBonus,success=total>=dc;
+log(`🎲 ${choice[0]}: ${roll} + ${S[choice[1]]}${bonus?` + equipe ${bonus}`:''}${styleBonus?` + estilo ${styleBonus}`:''} = ${total} (precisa de ${dc})`,'sys');
+if(success){contract.successes++;contract.preparationSuccesses++;gain(4+rank*2);log('A rotina funciona e a equipe avança com mais segurança. Ela também melhora a recompensa final.','ok')}
+else{contract.failures++;const damage=3+rank*2;S.hp=Math.max(1,S.hp-damage);S.fatigue=Math.min(100,(S.fatigue||0)+5);log(`O plano encontra dificuldades. Você perde ${damage} HP e a equipe segue com cautela.`,'bad')}
+if(choice[2]=='heal'){const healed=Math.min(12,S.mh-S.hp);S.hp+=healed;if(healed)log(`🩹 Você atende os ferimentos e recupera ${healed} HP.`,'ok')}
+if(choice[2]=='chakra'){S.ck=Math.min(S.mc,S.ck+10);S.fatigue=Math.max(0,(S.fatigue||0)-8);log('💠 Você recupera 10 chakra e reduz a fadiga.','ok')}
+if(choice[2]=='rest'){S.hp=Math.min(S.mh,S.hp+6);S.ck=Math.min(S.mc,S.ck+6);S.fatigue=Math.max(0,(S.fatigue||0)-12);log('🌙 A pausa recupera um pouco de vida, chakra e energia.','ok')}
+contract.phase++;
+if(contract.phase>=MISSION_ROUTINE_PHASES.length){
+missionBanter(S.team,success,contract.mission[1],`rotina do dia ${contract.day}`);
+contract.phase=0;
+if(contract.day>=contract.days){contract.status='final';contract.finalS=0;log(`🏁 Os ${contract.days} dias de preparação terminaram. É hora de concluir o objetivo principal.`,'bt')}
+else{contract.day++;log(`🌅 Dia ${contract.day}/${contract.days}: uma nova rotina começa na operação.`,'bt')}
+}
+tick(1);
+if(contract.status=='final')resumeMultiDayMission();else render()
+}
+function syncMultiDayFinal(){const contract=S.activeContract;if(!contract||contract.status!='final'||!M)return;contract.finalS=M.s;contract.failures=M.failures||0;contract.successes=M.successes||0;contract.secondaryObjectives=M.secondaryObjectives||0;contract.preparationSuccesses=M.preparationSuccesses||contract.preparationSuccesses||0;save()}
 function storyState(){S.story=S.story||{progress:{},completed:{},defeatedBosses:{},consequences:{}};S.story.progress=S.story.progress||{};S.story.completed=S.story.completed||{};S.story.defeatedBosses=S.story.defeatedBosses||{};S.story.consequences=S.story.consequences||{};return S.story}
 function storyArcOpen(index){const story=storyState(),arc=STORY_ARCS[index],req=arc.unlock;return(index===0||story.completed[STORY_ARCS[index-1].id])&&S.rk>=req.rank&&S.lv>=req.level&&S.done>=req.missions}
 function storyLockReason(index){const arc=STORY_ARCS[index],req=arc.unlock;if(index>0&&!storyState().completed[STORY_ARCS[index-1].id])return `Conclua ${STORY_ARCS[index-1].title} primeiro.`;return `Requer rank ${RK[req.rank]}, nível ${req.level} e ${req.missions} missões concluídas.`}
-function startStoryMission(id){if(M||B||S.assignment?.status=='active')return log('Conclua a atividade atual antes de iniciar um arco da história.','sys');const index=STORY_ARCS.findIndex(arc=>arc.id==id),arc=STORY_ARCS[index];if(!arc)return;if(!storyArcOpen(index))return log(`🔒 ${storyLockReason(index)}`,'sys');const story=storyState(),stageIndex=story.progress[id]||0;if(story.completed[id]||stageIndex>=arc.missions.length)return log('Este arco já foi concluído.','sys');const stage=arc.missions[stageIndex];M={m:[stage.rank,stage.title,stage.description,stage.enemy||'',stage.reward,stage.xp,stage.goal||''],i:-2,s:0,n:1,failures:0,successes:0,secondaryObjectives:0,step:stage.scene,story:{arcId:id,stageIndex,enemy:stage.enemy||'',isBoss:!!EN[stage.enemy]?.[4]}};log(`📖 <b>${arc.title}</b> · Etapa ${stageIndex+1}/${arc.missions.length}: ${stage.title}`,'bt');nx()}
+function startStoryMission(id){if(S.activeContract||M||B||S.assignment?.status=='active')return log('Conclua ou retome a missão atual antes de iniciar outra.','sys');const index=STORY_ARCS.findIndex(arc=>arc.id==id),arc=STORY_ARCS[index];if(!arc)return;if(!storyArcOpen(index))return log(`🔒 ${storyLockReason(index)}`,'sys');const story=storyState(),stageIndex=story.progress[id]||0;if(story.completed[id]||stageIndex>=arc.missions.length)return log('Este arco já foi concluído.','sys');const stage=arc.missions[stageIndex],storyRun={arcId:id,stageIndex,enemy:stage.enemy||'',isBoss:!!EN[stage.enemy]?.[4]};log(`📖 <b>${arc.title}</b> · etapa ${stageIndex+1}/${arc.missions.length}.`,'bt');beginMultiDayMission([stage.rank,stage.title,stage.description,stage.enemy||'',stage.reward,stage.xp,stage.goal||''],-2,storyRun,stage.scene)}
 function finishStoryStage(run){if(!run)return;const story=storyState(),arc=STORY_ARCS.find(entry=>entry.id==run.arcId);if(!arc)return;const next=run.stageIndex+1;story.progress[arc.id]=next;if(run.isBoss&&run.enemy)story.defeatedBosses[run.enemy]=true;if(next>=arc.missions.length){story.completed[arc.id]=true;story.consequences[arc.id]=arc.consequence;log(`📜 <b>${arc.title} concluído.</b> ${arc.consequence}`,'ok')}else log(`📖 A história avança: ${arc.title} · etapa ${next+1}/${arc.missions.length}.`,'bt');save()}
 function campaignBoard(){const story=storyState();return '<h3>📖 História principal</h3><div class="g">'+STORY_ARCS.map((arc,index)=>{const done=!!story.completed[arc.id],stage=story.progress[arc.id]||0,open=storyArcOpen(index),label=done?'Arco concluído · consequência registrada':open?`Continuar · etapa ${stage+1}/${arc.missions.length}: ${arc.missions[stage].title}`:storyLockReason(index);return btn(`${arc.title}<small>${arc.summary}</small><small>${label}</small>`,open&&!done?`startStoryMission('${arc.id}')`:`log('${done?'Este arco já foi concluído.':`🔒 ${label}`}','sys')`,open&&!done?'p':'lock')}).join('')+'</div>'}
-function smis0(i){if(S.assignment?.status=='active')return log('Conclua ou retome a operação designada pela Hokage antes de aceitar outro contrato.','sys');const m=MS[i];M={m,i,s:0,n:2+MSK.indexOf(m[0]),failures:0,successes:0,secondaryObjectives:0};log(`📜 <b>Missão rank ${m[0]}: ${m[1]}</b> — ${m[2]}`);nx()}
+function smis0(i){if(S.activeContract)return log('Conclua ou retome a missão atual antes de aceitar outro contrato.','sys');if(S.assignment?.status=='active')return log('Conclua ou retome a operação designada pela Hokage antes de aceitar outro contrato.','sys');const m=MS[i];if(!m)return;beginMultiDayMission(m,i)}
 function answerUrgent(){const event=S.urgent;if(!event)return log('Não há chamado urgente ativo.','sys');if(event.response=='ignored')return log('Você decidiu não intervir neste chamado.','sys');if(S.loc!=event.loc)return log(`O chamado está em ${L[event.loc][1]}. Viaje até lá antes de responder.`,'sys');S.urgent=null;M={m:[event.rank,event.title,event.description,'',event.reward,event.xp,event.goal],i:-1,s:0,n:1,failures:0,successes:0,secondaryObjectives:0,step:event.scene,urgent:event};log(`🆘 Você atende ao chamado: <b>${event.title}</b>.`,'bt');nx()}
-function answerAssignment(){const assignment=S.assignment;if(!assignment||assignment.status!='offered')return log('Não há uma designação pendente da Hokage.','sys');if(S.loc!='torre')return log('Apresente-se na Torre do Hokage antes de partir.','sys');assignment.status='active';S.loc=assignment.loc;mode='assignment';log(`🛡️ Tsunade confirma a missão. Você parte para ${L[assignment.loc][1]} com ${assignment.squad.map(id=>N[id][0]).join(' e ')}.`,'bt');tick(1);render()}
-function assignmentPick(index){const assignment=S.assignment;if(!assignment||assignment.status!='active')return;const scene=assignment.stages[assignment.stage],choice=scene?.[1][index];if(!choice)return;const stat=choice[1],bonus=Math.min(4,assignment.squad.reduce((total,id)=>total+(N[id][5][0]==stat?2:0),0)),roll=R(1,20),dc=12+MSK.indexOf(assignment.rank)*2,total=roll+S[stat]+bonus;log(`🎲 ${choice[0]}: ${roll} + ${S[stat]}${bonus?` + equipe ${bonus}`:''} = ${total} (precisa de ${dc})`,'sys');
-if(total>=dc){assignment.successes++;gain(10);log('A equipe executa o plano e avança com segurança.','ok')}else{assignment.failures++;const damage=6+MSK.indexOf(assignment.rank)*3;S.hp=Math.max(1,S.hp-damage);gain(4);log(`O plano encontra resistência. A equipe perde tempo e você sofre ${damage} HP de dano, mas a operação continua.`,'bad')}missionBanter(assignment.squad,total>=dc,assignment.title,choice[0]);
-assignment.stage++;const complete=assignment.stage>=assignment.stages.length;tick(3);
-if(complete){const reward=Math.max(50,assignment.reward-assignment.failures*25),xp=Math.max(20,assignment.xp-assignment.failures*8),payout=completeMission(assignment.rank,reward,xp,false,missionBonuses(assignment,assignment));assignment.squad.forEach(id=>remember(id,'missao',`Concluíram juntos “${assignment.title}”.`,{affinity:6,trust:4,respect:2,sharedMissions:1}));settlePromises(assignment.squad,assignment.title);S.assignment=null;mode='map';log(`✅ <b>${assignment.title} concluída!</b> +${payout.ryo} ryō, +${payout.xp} XP e +6 de afinidade com cada integrante da equipe${missionBonusText(payout)}. Missões concluídas: ${S.done}.`,'ok');save();render()}else{log(`🌅 Dia ${S.day}: etapa ${assignment.stage+1}/${assignment.stages.length}. A operação continua com a equipe.`,'bt');mode='assignment';render()}}
-function vAssignment(){const assignment=S.assignment,scene=assignment.stages[assignment.stage],squad=assignment.squad.map(id=>`${N[id][1]} ${N[id][0]}`).join(' · ');return `<h3>🛡️ ${assignment.title}</h3><small style="color:var(--mu)">Dia ${assignment.stage+1}/${assignment.stages.length} · Rank ${assignment.rank} · ${assignment.successes} sucessos · ${assignment.failures} contratempos</small><div class="world">🤝 Equipe designada: ${squad}<br>📍 ${L[assignment.loc][1]}</div><p>${scene[0]}</p><div class="g">${scene[1].map((choice,index)=>btn(`${choice[0]}<small>Teste de ${choice[1].toUpperCase()} · consome um dia</small>`,`assignmentPick(${index})`)).join('')}</div><div class="row">${btn('⏸️ Pausar e voltar ao mapa',"mode='map';render()")}</div>`}
+function answerAssignment(){const assignment=S.assignment;if(!assignment||assignment.status!='offered')return log('Não há uma designação pendente da Hokage.','sys');if(S.loc!='torre')return log('Apresente-se na Torre do Hokage antes de partir.','sys');assignment.status='active';assignment.phase=0;S.loc=assignment.loc;mode='assignment';log(`🛡️ Tsunade confirma a missão. Você parte para ${L[assignment.loc][1]} com ${assignment.squad.map(id=>N[id][0]).join(' e ')}.`,'bt');tick(1);if(S.t)tick(3-S.t);render()}
+function assignmentPick(index){
+const assignment=S.assignment;if(!assignment||assignment.status!='active')return;
+const mission=[assignment.rank,assignment.title,assignment.description,'',assignment.reward,assignment.xp],style=missionStyle(mission),phase=assignment.phase||0,scene=phase==1?assignment.stages[assignment.stage]:MISSION_ROUTINES[style][phase==0?0:2],choice=scene?.[1][index];if(!choice)return;
+const stat=choice[1],bonus=Math.min(4,assignment.squad.reduce((total,id)=>total+(N[id][5][0]==stat?2:0),0)),styleBonus=styleTestBonus(stat),rank=MSK.indexOf(assignment.rank),roll=R(1,20),dc=12+rank*2,total=roll+S[stat]+bonus+styleBonus,success=total>=dc;
+log(`🎲 ${choice[0]}: ${roll} + ${S[stat]}${bonus?` + equipe ${bonus}`:''}${styleBonus?` + estilo ${styleBonus}`:''} = ${total} (precisa de ${dc})`,'sys');
+if(success){assignment.successes++;if(phase!=1)assignment.preparationSuccesses=(assignment.preparationSuccesses||0)+1;gain(phase==1?10:4+rank*2);log(phase==1?'A equipe executa o plano e avança com segurança.':'A rotina funciona e também melhora a recompensa final.','ok')}
+else{assignment.failures++;const damage=phase==1?6+rank*3:3+rank*2;S.hp=Math.max(1,S.hp-damage);gain(phase==1?4:2);log(`O plano encontra resistência. Você perde ${damage} HP, mas a operação continua.`,'bad')}
+if(choice[2]=='heal')S.hp=Math.min(S.mh,S.hp+12);
+if(choice[2]=='chakra')S.ck=Math.min(S.mc,S.ck+10);
+if(choice[2]=='rest'){S.hp=Math.min(S.mh,S.hp+6);S.ck=Math.min(S.mc,S.ck+6);S.fatigue=Math.max(0,(S.fatigue||0)-12)}
+assignment.phase++;
+const dayComplete=assignment.phase>=MISSION_ROUTINE_PHASES.length;
+if(dayComplete){missionBanter(assignment.squad,success,assignment.title,`rotina do dia ${assignment.stage+1}`);assignment.phase=0;assignment.stage++}
+const complete=assignment.stage>=assignment.stages.length;tick(1);
+if(complete){const reward=Math.max(50,assignment.reward-assignment.failures*25),xp=Math.max(20,assignment.xp-assignment.failures*8),payout=completeMission(assignment.rank,reward,xp,false,missionBonuses(assignment,assignment));assignment.squad.forEach(id=>remember(id,'missao',`Concluíram juntos “${assignment.title}”.`,{affinity:6,trust:4,respect:2,sharedMissions:1}));settlePromises(assignment.squad,assignment.title);S.assignment=null;mode='map';log(`✅ <b>${assignment.title} concluída!</b> +${payout.ryo} ryō, +${payout.xp} XP e +6 de afinidade com cada integrante da equipe${missionBonusText(payout)}. Missões concluídas: ${S.done}.`,'ok');save();render()}
+else{if(dayComplete)log(`🌅 Dia ${S.day}: etapa ${assignment.stage+1}/${assignment.stages.length}. A operação continua com a equipe.`,'bt');mode='assignment';render()}
+}
+function vAssignment(){
+const assignment=S.assignment,phase=assignment.phase||0,mission=[assignment.rank,assignment.title,assignment.description,'',assignment.reward,assignment.xp],style=missionStyle(mission),scene=phase==1?assignment.stages[assignment.stage]:MISSION_ROUTINES[style][phase==0?0:2],squad=assignment.squad.map(id=>`${N[id][1]} ${N[id][0]}`).join(' · ');
+const rank=MSK.indexOf(assignment.rank);
+return `<h3>🛡️ ${assignment.title}</h3><small style="color:var(--mu)">Dia ${assignment.stage+1}/${assignment.stages.length} · ${MISSION_ROUTINE_PHASES[phase]} · Rank ${assignment.rank} · ${assignment.successes} sucessos · ${assignment.failures} contratempos</small><div class="world">🤝 Equipe designada: ${squad}<br>📍 ${L[assignment.loc][1]} · Estilo: ${style}</div><p>${scene[0]}</p><div class="g">${scene[1].map((choice,index)=>{const bonus=Math.min(4,assignment.squad.reduce((total,id)=>total+(N[id][5][0]==choice[1]?2:0),0));return btn(`${choice[0]}<small>Teste de ${choice[1].toUpperCase()} · ${missionTestPreview(choice[1],12+rank*2,bonus)}</small>`,`assignmentPick(${index})`)}).join('')}</div><div class="row">${btn('⏸️ Pausar e voltar ao mapa',"mode='map';render()")}</div>`
+}
+function vContract(){
+const contract=S.activeContract;if(!contract)return vMap();
+const mission=contract.mission;
+const preparationBonus=Math.min(20,(contract.preparationSuccesses||0)*1.5);
+if(contract.status=='final')return `<h3>🏁 Etapa final · ${esc(mission[1])}</h3><p>Você concluiu ${contract.days} dias de planejamento e rotina em campo. Agora falta resolver o objetivo principal.</p><div class="world">✅ ${contract.preparationSuccesses||0} preparações bem-sucedidas · ⚠️ ${contract.failures} contratempos<br>🏅 Bônus de recompensa por preparação: +${preparationBonus}%</div><div class="g">${btn('Iniciar etapa final','resumeMultiDayMission()','p')}</div>`;
+const scene=MISSION_ROUTINES[contract.style][contract.phase];
+return `<h3>📜 ${esc(mission[1])}</h3><small style="color:var(--mu)">Dia ${contract.day}/${contract.days} · Rank ${mission[0]} · ${MISSION_ROUTINE_PHASES[contract.phase]}</small><div class="world">🎯 ${esc(mission[2])}<br>🧭 Estilo da missão: ${contract.style=='combat'?'combate':contract.style=='retrieve'?'investigação e recuperação':contract.style=='deliver'?'entrega':contract.style=='rescue'?'resgate':contract.style=='protect'?'proteção':'escolta'} · ${contract.successes} sucessos · ${contract.failures} contratempos<br>🏅 Preparação: ${contract.preparationSuccesses||0} acertos · bônus atual +${preparationBonus}%</div><p>${scene[0]}</p><div class="g">${scene[1].map((choice,index)=>btn(`${choice[0]}<small>Teste de ${choice[1].toUpperCase()} · ${missionTestPreview(choice[1],Math.max(9,12+MSK.indexOf(mission[0])*2-Math.floor((S.rep||0)/30)))}</small>`,`missionRoutinePick(${index})`)).join('')}</div>`
+}
 function nx(){if(M.s<M.n){let scene=M.s==0?(M.step||MSTEP[M.i]):P(STP);if(M.s==0&&M.i>=0&&MISSION_OPTIONS[M.i])scene=[scene[0],[...scene[1],MISSION_OPTIONS[M.i]]];M.cur=M.failures&&M.s==M.n-1?[`Por causa dos contratempos, você chega sob pressão. ${scene[0]}`,scene[1]]:scene;mode='mis';render()}else{const m=M.m;if(m[6]){const goal=OBJ[m[6]];M.cur=[M.failures?`${goal[0]} As dificuldades anteriores deixaram pouco tempo para concluir.`:goal[0],goal[1]];mode='goal';render();return}const base=EN[m[3]],f=M.failures,e=[base[0],Math.round(base[1]*(1+f*.08)),Math.round(base[2]*(1+f*.05)),base[3],base[4]];log(f?`Os contratempos alertaram o inimigo. ${e[4]?'O líder':'O adversário'} espera por você.`:e[4]?`Você chega ao covil… e o líder da missão o aguarda.`:'Você chega ao objetivo e o confronto é inevitável!','bt');
-fight(e,{win:()=>{const payout=completeMission(m[0],m[4],m[5],false,missionBonuses(m,M));missionBanter(S.team,true,m[1],'conclusão da missão');settlePromises(S.team,m[1]);finishStoryStage(M.story);log(`✅ Missão rank ${m[0]} cumprida! +${payout.ryo} ryo e +${payout.xp} XP${missionBonusText(payout)}. (Total: ${S.done})`,'ok');M=null;tick(1)}})}}
-function pick(j){const c=M.cur[1][j],ri=MSK.indexOf(M.m[0]),bonus=teamBonus(c[1]),dc=Math.max(8,10+ri*3-Math.floor((S.rep||0)/25)),r=R(1,20),tt=r+S[c[1]]+bonus,secondary=M.s==0&&M.i>=0&&MISSION_OPTIONS[M.i]?.[0]==c[0];
-log(`🎲 ${c[0]}: ${r} + ${S[c[1]]}${bonus?` + equipe ${bonus}`:''} = ${tt} (precisa de ${dc})`,'sys');
+fight(e,{win:()=>{const payout=completeMission(m[0],m[4],m[5],false,missionBonuses(m,M));missionBanter(S.team,true,m[1],'conclusão da missão');settlePromises(S.team,m[1]);finishStoryStage(M.story);log(`✅ Missão rank ${m[0]} cumprida! +${payout.ryo} ryo e +${payout.xp} XP${missionBonusText(payout)}. (Total: ${S.done})`,'ok');S.activeContract=null;M=null;tick(1)}})}}
+function pick(j){const c=M.cur[1][j],ri=MSK.indexOf(M.m[0]),bonus=teamBonus(c[1]),styleBonus=styleTestBonus(c[1]),dc=Math.max(8,10+ri*3-Math.floor((S.rep||0)/25)),r=R(1,20),tt=r+S[c[1]]+bonus+styleBonus,secondary=M.s==0&&M.i>=0&&MISSION_OPTIONS[M.i]?.[0]==c[0];
+log(`🎲 ${c[0]}: ${r} + ${S[c[1]]}${bonus?` + equipe ${bonus}`:''}${styleBonus?` + estilo ${styleBonus}`:''} = ${tt} (precisa de ${dc})`,'sys');
 if(tt>=dc){M.successes++;if(secondary){M.secondaryObjectives=(M.secondaryObjectives||0)+1;log('⭐ Objetivo secundário concluído. Ele renderá um bônus ao finalizar a missão.','ok')}gain(8+ri*2);log('Deu certo! Você avança.','ok')}else{M.failures++;const d=6+ri*4;S.hp=Math.max(1,S.hp-d);log(`Falhou e perdeu ${d} HP, mas segue em frente. O contratempo pode tornar o final mais difícil.`,'bad')}missionBanter(S.team,tt>=dc,M.m[1],c[0]);
-M.s++;tick(1);nx()}
-function pickGoal(j){const m=M.m,c=M.cur[1][j],ri=MSK.indexOf(m[0]),bonus=teamBonus(c[1]),dc=Math.max(9,12+ri*3+(M.failures||0)*2-Math.floor((S.rep||0)/25)),r=R(1,20),tt=r+S[c[1]]+bonus;log(`🎲 ${c[0]}: ${r} + ${S[c[1]]}${bonus?` + equipe ${bonus}`:''} = ${tt} (precisa de ${dc})`,'sys');
+M.s++;syncMultiDayFinal();tick(1);nx()}
+function pickGoal(j){const m=M.m,c=M.cur[1][j],ri=MSK.indexOf(m[0]),bonus=teamBonus(c[1]),styleBonus=styleTestBonus(c[1]),dc=Math.max(9,12+ri*3+(M.failures||0)*2-Math.floor((S.rep||0)/25)),r=R(1,20),tt=r+S[c[1]]+bonus+styleBonus;log(`🎲 ${c[0]}: ${r} + ${S[c[1]]}${bonus?` + equipe ${bonus}`:''}${styleBonus?` + estilo ${styleBonus}`:''} = ${tt} (precisa de ${dc})`,'sys');
 if(tt>=dc){const payout=completeMission(m[0],m[4],m[5],M.urgent,missionBonuses(m,M));if(M.urgent){rel(M.urgent.npc,5);pres(S.loc).filter(id=>id!=M.urgent.npc).forEach(id=>rel(id,1));log(`🤝 ${N[M.urgent.npc][0]} e os moradores reconhecem sua ajuda.`,'ok')}finishStoryStage(M.story);log(`✅ Objetivo concluído! +${payout.ryo} ryo e +${payout.xp} XP${missionBonusText(payout)}. Missões concluídas: ${S.done}.`,'ok')}
 else{const d=8+ri*3;S.hp=Math.max(1,S.hp-d);gain(Math.floor(m[5]*.25));recordWorldEvent('failure',m[1],M.m[6]=='protect'?'A proteção falhou e civis ou aliados ainda correm risco.':'O objetivo de resgate não foi concluído.');if(M.urgent){S.rep=Math.max(0,(S.rep||0)-2);rel(M.urgent.npc,-2);log('A vila perde um pouco de confiança após o resgate malsucedido. Reputação −2.','bad')}log(`❌ O objetivo não foi concluído. Você perde ${d} HP e recebe XP pela experiência da tentativa, mas sem recompensa ou crédito de missão.`,'bad')}missionBanter(S.team,tt>=dc,m[1],c[0]);settlePromises(S.team,m[1]);
-M=null;mode='map';tick(1);render()}
+S.activeContract=null;M=null;mode='map';tick(1);render()}
 
 /* ===== Bloco 9: renderização das telas e interface do jogo ===== */
 const back=btn('↩️ Voltar',"mode='map';render()");
 function vMap(){const x=EXR[S.rk];
 const people=pres(S.loc).map(id=>{const travel=S.wd?.travel?.[id];return btn(`${N[id][1]} ${N[id][0]}<small>${ageOf(id)} anos · ${N[id][2]}</small><small>${rl(S.rel[id]||0)}${S.rs[id]=='couple'?' · 💞':''}</small>${travel?`<small>🚶 A caminho de ${L[travel.to][1]}</small>`:''}`,`npc('${id}')`)}).join('');
-const places=LOC_GROUPS.map(([group,keys],i)=>{const cards=keys.filter(k=>k!=S.loc).map(k=>{const req=LOC_REQ[k],locked=req&&(S.rk<req.rk||S.done<req.done),detail=locked?`Bloqueado · rank ${RK[req.rk]} · ${req.done} missões`:'Viajar para este local';return btn(`${L[k][0]} ${L[k][1]}<small>${detail}</small>`,`go('${k}')`,locked?'lock':'')}).join('');return cards?`<details class="place-group" ${i===0?'open':''}><summary>${group}</summary><div class="loc-grid">${cards}</div></details>`:''}).join('');
 const incident=S.urgent?`<div class="world alert"><b>🚨 CHAMADO URGENTE · ${S.urgent.title}</b><br>${S.urgent.description}${crisisInfo(S.urgent)}<br><small>Destino: ${L[S.urgent.loc][1]} · prazo: ${S.urgent.daysLeft} dia(s)</small>${S.urgent.response=='ignored'?'<p>Você decidiu não intervir. A situação continua evoluindo.</p>':S.urgent.response=='self'?'<p>Você assumiu o atendimento; viaje até o destino para começar.</p>':''}${S.urgent.response=='ignored'?'':`<div class="row">${S.urgent.response=='self'?btn(S.loc==S.urgent.loc?'Atender chamado':'Viajar até o destino',S.loc==S.urgent.loc?'answerUrgent()':'goUrgent()','p'):''}</div>`}</div>`:'';
 const examButton=S.rk<3?btn(`${x.nm}<small>${exok(x)?'Requisitos completos · iniciar':`Requisitos: ${exreq(x)}`}</small>`,'exam()',exok(x)?'p':'lock'):'';
-const deployment=S.assignment?`<div class="world alert"><b>📜 Designação da Hokage: ${S.assignment.title}</b><br>${S.assignment.description}<br><small>Equipe: ${S.assignment.squad.map(id=>N[id][0]).join(' e ')} · ${S.assignment.status=='active'?`etapa ${S.assignment.stage+1}/${S.assignment.stages.length}`:'apresente-se na Torre do Hokage'}</small><div class="row">${S.assignment.status=='active'?btn('Retomar operação',"mode='assignment';render()",'p'):btn(S.loc=='torre'?'Partir para a missão':'Ir à Torre do Hokage',S.loc=='torre'?'answerAssignment()':"go('torre')",'p')}</div></div>`:'';
+const deployment=S.assignment?`<div class="world alert"><b>📜 Designação da Hokage: ${S.assignment.title}</b><br>${S.assignment.description}<br><small>Equipe: ${S.assignment.squad.map(id=>N[id][0]).join(' e ')} · ${S.assignment.status=='active'?`dia ${S.assignment.stage+1}/${S.assignment.stages.length} · ${MISSION_ROUTINE_PHASES[S.assignment.phase||0]}`:'apresente-se na Torre do Hokage'}</small><div class="row">${S.assignment.status=='active'?btn('Retomar operação',"mode='assignment';render()",'p'):btn(S.loc=='torre'?'Partir para a missão':'Ir à Torre do Hokage',S.loc=='torre'?'answerAssignment()':"go('torre')",'p')}</div></div>`:'';
+const contractDeployment=S.activeContract?`<div class="world alert"><b>📜 Operação em andamento: ${esc(S.activeContract.mission[1])}</b><br><small>${S.activeContract.status=='final'?'Rotina diária concluída · objetivo final pendente':`Dia ${S.activeContract.day}/${S.activeContract.days} · ${MISSION_ROUTINE_PHASES[S.activeContract.phase]}`}</small><div class="row">${btn(S.activeContract.status=='final'?'Retomar etapa final':'Retomar rotina diária',"resumeMultiDayMission()",'p')}</div></div>`:'';
 const tabs=[['places','📍 Mapa'],['training','🥋 Treinos'],['care','🧘 Descanso'],['services','📜 Serviços'],['action','✍️ Ação']];
 const nav=`<nav class="category-nav" aria-label="Categorias de ações">${tabs.map(([key,label])=>`<button class="b category-tab ${mapTab==key?'cat-active':''}" aria-pressed="${mapTab==key}" onclick="mapTab='${key}';render()">${label}</button>`).join('')}</nav>`;
 let content='';
-if(mapTab=='places')content=`<h3>${L[S.loc][0]} ${L[S.loc][1]}</h3><div class="world">🌦️ ${S.season||'Primavera'} · ${S.weather||'Céu limpo'} · Reputação da vila: ${Math.floor(S.rep||0)}/100</div><h4>Pessoas por perto</h4><div class="g">${people||'<small>Ninguém está por aqui agora.</small>'}</div><h4>Explorar locais</h4>${places}`;
+if(mapTab=='places')content=`<h3>${L[S.loc][0]} ${L[S.loc][1]}</h3><div class="world">🌦️ ${S.season||'Primavera'} · ${S.weather||'Céu limpo'} · Reputação da vila: ${Math.floor(S.rep||0)}/100</div><h4>Pessoas por perto</h4><div class="g">${people||'<small>Ninguém está por aqui agora.</small>'}</div><h4>Explorar locais</h4>`;
 else if(mapTab=='training')content=`<h3>🥋 Treinos e progressão</h3><small style="color:var(--mu)">Fadiga ${S.fatigue||0}% · Tai ${S.practice?.tai||0}/3 · Vel ${S.practice?.vel||0}/3 · Nin ${S.practice?.nin||0}/3 · Int ${S.practice?.int||0}/3</small><div class="g">`+btn('🥋 Treino físico<small>Desenvolve Tai · aumenta fadiga</small>',"self('tai')")+btn('🏃 Treino de agilidade<small>Desenvolve Vel · aumenta fadiga</small>',"self('vel')")+btn('🌀 Controle de chakra<small>Desenvolve Nin · custa chakra</small>',"self('nin')")+btn('📖 Estudo tático<small>Desenvolve Int · exige concentração</small>',"self('int')")+btn('🎯 Praticar jutsu<small>Consome chakra e aumenta maestria</small>',"mode='jt';render()")+(S.loc=='academia'&&academyStudent()&&!academyComplete()?btn(`📚 Aula prática<small>${S.academySessions||0}/${ACADEMY_CLASS_COUNT} aulas concluídas</small>`,'academyClass()'):'')+examButton+'</div>';
 else if(mapTab=='care')content=`<h3>🧘 Recuperação</h3><div class="g">`+btn('🧘 Meditar<small>Recupera chakra e reduz fadiga</small>',"self('m')")+btn('🛏️ Dormir<small>Avança até amanhã e restaura energia</small>',"self('s')")+(S.kit?btn('🩹 Usar kit médico<small>Recupera até 40 HP</small>',"item('kit')"):'')+(S.pill?btn('💊 Usar pílula<small>Recupera até 40 chakra</small>',"item('pill')"):'')+'</div>';
 else if(mapTab=='services')content=`<h3>📜 Serviços</h3><div class="g">`+btn(`🤝 Equipe shinobi<small>${(S.team||[]).length}/2 aliados · recrutamento por afinidade</small>`,"mode='team';render()",'p')+(S.rk>0?btn('📜 Abrir mural de missões<small>Escolha um contrato disponível</small>',"mode='ms';render()",'p'):btn('📜 Missões<small>Disponível após se tornar Genin</small>',"log('O mural de missões abre quando você se tornar Genin.','sys')",'lock'))+(S.loc=='mercado'?btn('🛒 Abrir loja ninja<small>Suprimentos e pergaminhos</small>',"mode='shop';render()",'p'):'')+'</div>';
 else content=`<h3>✍️ Ação livre</h3><p>Converse com alguém por perto ou descreva uma atividade.</p><div class="row"><input type="text" id="fr" placeholder="Ex.: conversar com Naruto, comer ramen ou explorar" onkeydown="if(event.key=='Enter')fr()">${btn('Executar','fr()','p')}</div>`;
-return incident+nav+deployment+content}
+return incident+nav+deployment+contractDeployment+content}
 function vTeam(){const team=S.team||[],available=Object.keys(N).filter(id=>(S.rel[id]||0)>=20&&!team.includes(id));return `<h3>🤝 Equipe shinobi · ${team.length}/2</h3><p>Convide personagens com afinidade 20 ou mais. Cada aliado ajuda nos testes da própria especialidade e participa uma vez por combate.</p><h4>Equipe atual</h4><div class="g">${team.map(id=>btn(`${N[id][1]} ${N[id][0]}<small>${N[id][2]} · Especialidade ${N[id][5][0].toUpperCase()}</small><small>Remover da equipe</small>`,`toggleTeam('${id}')`)).join('')||'<small>Nenhum aliado selecionado.</small>'}</div><h4>Aliados disponíveis</h4><div class="g">${available.map(id=>btn(`${N[id][1]} ${N[id][0]}<small>${N[id][2]} · Afinidade ${S.rel[id]}</small><small>Especialidade ${N[id][5][0].toUpperCase()} · +2 em testes</small>`,`toggleTeam('${id}')`)).join('')||'<small>Converse, treine ou ajude personagens para fortalecer a afinidade.</small>'}</div><div class="row">${back}</div>`}
 function vNpc(){const id=T,n=N[id],lv=S.love[id]||0,st=S.rs[id],bond=bondOf(id);
 let h=`<h3>${n[1]} ${n[0]}</h3><small style="color:var(--mu)">${ageOf(id)} anos · ${n[2]} · Vínculo: ${bondLabel(id)} · Afinidade ${S.rel[id]||0} · Confiança ${bond.trust||0} · Respeito ${bond.respect||0}</small><h4>Interações</h4><div class="g">`+btn('💬 Conversar<small>Trocar algumas palavras</small>',"dn('talk')")+btn('🥋 Treinar juntos<small>Ganha afinidade e prática</small>',"dn('train')")+btn('⚔️ Duelo amistoso<small>Combate sem risco de missão</small>',"dn('duel')")+btn('🤝 Pedir conselho<small>Requer afinidade 35</small>',"dn('adv')")+btn('😈 Provocar<small>Pode começar uma briga</small>',"dn('bully')")+(bond.rivalry>0||bond.trust<0?btn('🕊️ Fazer as pazes',`reconcile('${id}')`):'')+(SEN[id]?btn('🎓 Aprender técnicas<small>Treino especial com sensei</small>',"mode='sen';render()",'p'):'')+back
@@ -726,8 +851,8 @@ return h+`<h4>Conversa</h4><div class="g">`+btn('📍 Onde estamos?',"say('Onde 
 const vDate=()=>`<h3>🌹 Encontro com ${N[T][0]}</h3><p>Como vocês vão passar o tempo?</p><div class="g">`+DT.map((d,i)=>btn(`${d[0]}<small>usa ${d[1].toUpperCase()}</small>`,`dt(${i})`)).join('')+'</div>';
 const teamAction=()=>B.team?.length&&!B.teamUsed?btn('🤝 Ação da equipe<small>Dano conjunto · uma vez por combate</small>',"act('team')"):'';
 const vBattle=()=>`<h3>${B.boss?'👹':'⚔️'} ${B.n} ${B.el?E[B.el][1]:''}</h3>`+bar(B.boss?(B.ph?'Chefe · Fase 2':'Chefe'):'Inimigo',B.hp,B.mx,'hp')+(B.ch?`<p class="bad"><b>⚠️ ${B.intent||'O chefe prepara um ataque forte.'} Escolha Defender ou interrompa com um jutsu.</b></p>`:'')+(B.burnTurns?`<small class="bad">🔥 Queimadura: ${B.burnTurns} turno(s)</small>`:'')+(B.stunTurns?'<small class="ok">⚡ Inimigo paralisado</small>':'')+(B.slowTurns?'<small class="sys">Corrente elétrica enfraqueceu o ataque</small>':'')+(B.wallTurns?`<small class="ok">🪨 Parede de Terra: ${B.wallTurns} proteção(ões)</small>`:'')+`<small style="color:var(--mu)">Equipe: ${(B.team||[]).map(id=>N[id][0]).join(', ')||'sem aliados'}${B.teamUsed?' · ação cooperativa usada':''}</small><h4>Sua ação</h4><div class="g">`+btn('👊 Golpe de taijutsu<small>Dano físico, sem custo de chakra</small>',"act('tai')")+S.jt.map(k=>{const effect=JUTSU_EFFECTS[k];return btn(`${jn(k)}<small>${jc(k)} chakra · Maestria ${mlv(k)}${effect?` · ${effect.label}`:''}</small>`,`act('jut','${k}')`)}).join('')+teamAction()+btn('🛡️ Defender<small>Reduz dano e recupera chakra</small>',"act('def')")+(S.kit?btn('🩹 Kit médico<small>Recupera até 40 HP</small>',"act('kit')"):'')+(S.pill?btn('💊 Pílula<small>Recupera até 40 chakra</small>',"act('pill')"):'')+btn('💨 Tentar fugir<small>Chefes não permitem fuga</small>',"act('run')")+'</div>';
-const vMis=()=>`<h3>📜 ${M.m[1]} ${rkb(M.m[0])}</h3><small style="color:var(--mu)">Etapa ${M.s+1}/${M.n} · ${M.successes||0} sucessos · ${M.failures||0} contratempos${M.m[3]&&EN[M.m[3]][4]?' · chefe no final':''}</small><p>${M.cur[0]}</p><div class="g">`+M.cur[1].map((c,i)=>{const secondary=M.s==0&&M.i>=0&&MISSION_OPTIONS[M.i]?.[0]==c[0];return btn(`${c[0]}<small>${secondary?'⭐ Objetivo secundário · bônus na conclusão':`Teste de ${c[1].toUpperCase()}`}</small>`,`pick(${i})`)}).join('')+'</div>';
-const vGoal=()=>`<h3>🎯 Objetivo da missão: ${M.m[1]}</h3><small style="color:var(--mu)">Etapa final · rank ${M.m[0]} · contratempos anteriores: ${M.failures||0}. Escolha uma abordagem.</small><p>${M.cur[0]}</p><div class="g">`+M.cur[1].map((c,i)=>btn(`${c[0]}<small>Teste de ${c[1].toUpperCase()}</small>`,`pickGoal(${i})`)).join('')+'</div>';
+const vMis=()=>{const ri=MSK.indexOf(M.m[0]),dc=Math.max(8,10+ri*3-Math.floor((S.rep||0)/25));return `<h3>📜 ${M.m[1]} ${rkb(M.m[0])}</h3><small style="color:var(--mu)">Etapa ${M.s+1}/${M.n} · ${M.successes||0} sucessos · ${M.failures||0} contratempos · dificuldade ${dc}${M.m[3]&&EN[M.m[3]][4]?' · chefe no final':''}</small><p>${M.cur[0]}</p><div class="g">`+M.cur[1].map((c,i)=>{const secondary=M.s==0&&M.i>=0&&MISSION_OPTIONS[M.i]?.[0]==c[0];return btn(`${c[0]}<small>${secondary?'⭐ Objetivo secundário · bônus na conclusão · ':''}Teste de ${c[1].toUpperCase()} · ${missionTestPreview(c[1],dc)}</small>`,`pick(${i})`)}).join('')+'</div>'};
+const vGoal=()=>{const ri=MSK.indexOf(M.m[0]),dc=Math.max(9,12+ri*3+(M.failures||0)*2-Math.floor((S.rep||0)/25));return `<h3>🎯 Objetivo da missão: ${M.m[1]}</h3><small style="color:var(--mu)">Etapa final · rank ${M.m[0]} · contratempos anteriores: ${M.failures||0} · dificuldade ${dc}. Escolha uma abordagem.</small><p>${M.cur[0]}</p><div class="g">`+M.cur[1].map((c,i)=>btn(`${c[0]}<small>Teste de ${c[1].toUpperCase()} · ${missionTestPreview(c[1],dc)}</small>`,`pickGoal(${i})`)).join('')+'</div>'};
 const MTYPE={deliver:'Entrega',retrieve:'Recuperação',escort:'Escolta',rescue:'Resgate',protect:'Proteção'};
 const vBoard=()=>'<h3>📜 Mural de missões</h3><small style="color:var(--mu)">Os contratos mostram rank, resumo, recompensa e requisito de acesso.</small><div class="g" style="margin-top:8px">'+MS.map((m,i)=>({m,i})).sort((a,b)=>MSK.indexOf(a.m[0])-MSK.indexOf(b.m[0])).map(({m,i})=>{const r=m[0],ok=S.rk>=NEED[r]&&S.lv>=LVN[r],lk=ok?'':`🔒 ${RK[NEED[r]]}, nível ${LVN[r]}`,kind=m[6]?MTYPE[m[6]]:(EN[m[3]]?.[4]?'Combate contra chefe':'Combate');return btn(`${rkb(r)}${m[1]}<small>${m[2]}</small><small>${kind} · ${m[4]} ryo · ${m[5]} XP${lk?' · '+lk:''}</small>`,ok?`smis(${i})`:`log('🔒 Requer ${RK[NEED[r]]} e nível ${LVN[r]}.','sys')`,ok?'':'lock')}).join('')+back+'</div>';
 const vShop=()=>'<h3>🛒 Loja ninja</h3><div class="g">'+btn(`🩹 Kit médico<small>${marketPrice(25)} ryō · +40 HP</small>`,"buy('kit',25)")+btn(`💊 Pílula de soldado<small>${marketPrice(30)} ryō · +40 chakra</small>`,"buy('pill',30)")+btn(`📜 Pergaminho de treino<small>${marketPrice(120)} ryō · +1 atributo</small>`,"buy('scr',120)")+back+'</div>';
@@ -735,13 +860,13 @@ const jn=k=>{const[e,i]=k.split(':');return E[e][1]+' '+E[e][3][i]};
 const vJt=()=>'<h3>🎯 Praticar jutsu</h3><small style="color:var(--mu)">A cada 8 usos a Maestria sobe (máx. 5): +12% de dano e −7% de custo por nível. Usar em combate e treinar com alguém também conta.</small><div class="g" style="margin-top:8px">'+S.jt.map(k=>{const effect=JUTSU_EFFECTS[k];return btn(`${jn(k)}<small>Maestria ${mlv(k)}/5 · ${jc(k)} chakra${effect?` · ${effect.label}`:''}</small>`,`prac('${k}')`)}).join('')+back+'</div>';
 const vSen=()=>{const id=T,n=N[id];return `<h3>🎓 Treinar com ${n[0]}</h3><small style="color:var(--mu)">Afinidade 40+. Elementos: ${els().length}/${Math.max(1,S.rk)} (Chunin libera o 2º, Jounin o 3º).</small>`+SEN[id].map(e=>`<h4>${E[e][1]} ${E[e][0]}</h4><div class="g">`+[0,1,2].map(i=>{const k=e+':'+i,has=S.jt.includes(k);return btn(`${has?'✔ ':''}${E[e][3][i]}<small>${has?'Dominado · Maestria '+mlv(k):'Nv '+TL[i]+' · '+TC[i]+' ryo'}</small>`,has?"log('Você já domina esta técnica.','sys')":`teach('${k}')`,has?'lock':'')}).join('')+'</div>').join('')+`<div class="row">${back}</div>`};
 const vEx=()=>{const g=EXS[X.rk][X.s],quiz=g.t=='quiz',team=g.t=='team',total=quiz?g.qs.length:team?g.tasks.length:g.c,prompt=quiz?g.qs[X.i][0]:X.cur[0],choices=quiz?g.qs[X.i][1].map((text,j)=>[text,j,'']):X.cur[1].map((choice,j)=>[choice[0],j,choice[1]]);return `<h3>🏟️ ${g.n}</h3><small style="color:var(--mu)">Fase ${X.s+1}/${EXS[X.rk].length} · tarefa ${X.i+1}/${total} · acertos ${X.ok} (mínimo ${g.need})</small>`+(team?`<div class="world">🤝 Esquadrão: ${X.squad.map(id=>N[id][0]).join(' e ')} · confiança ${X.trust}%</div>`:'')+`<p>${prompt}</p><div class="g">`+choices.map(([text,j,stat])=>btn(`${text}<small>${team?`Coordenação · ${stat.toUpperCase()}`:quiz?'Resposta':`Usa ${stat.toUpperCase()}`}</small>`,`exa(${j})`)).join('')+'</div>'};
-const V={map:vMap,npc:vNpc,date:vDate,battle:vBattle,mis:vMis,goal:vGoal,ms:vBoard,shop:vShop,jt:vJt,sen:vSen,team:vTeam,ex:vEx,assignment:vAssignment};
+const V={map:vMap,npc:vNpc,date:vDate,battle:vBattle,mis:vMis,goal:vGoal,ms:vBoard,shop:vShop,jt:vJt,sen:vSen,team:vTeam,ex:vEx,assignment:vAssignment,contract:vContract};
 function render(){
-$('#st').innerHTML=`<div class="status-heading"><div><span class="status-name">${esc(S.n)}</span><span class="status-sub">${S.a} anos · ${E[S.el][1]} ${E[S.el][0]} · ${S.style||'Equilibrado'}</span></div><span class="status-rank">${RK[S.rk]} · Nível ${S.lv} · ${S.power||'Regular'}</span></div>`+
+$('#st').innerHTML=`<div class="status-heading"><div><span class="status-name">${esc(S.n)}</span><span class="status-sub">${S.a} anos · ${E[S.el][1]} ${E[S.el][0]} · ${S.style||'Equilibrado'} · Estilo de combate: ${combatStyleName()}</span></div><span class="status-rank">${RK[S.rk]} · Nível ${S.lv} · ${S.power||'Regular'}</span></div>`+
 `<div class="status-bars">`+bar('❤️ Vida',S.hp,S.mh,'hp')+bar('💠 Chakra',S.ck,S.mc,'ck')+bar('✨ Experiência',S.xp,S.lv*40,'ac')+respBars()+`</div>`+
 `<div class="status-meta"><span><b>Ryō</b><br>💰 ${S.ryo}</span><span><b>Calendário</b><br>Dia ${S.day} · ${TM[S.t]} · Ano ${1+(S.worldYears||0)}</span><span><b>Próximo aniversário</b><br>${DAYS_PER_YEAR-(S.ageDays||0)} dias</span><span><b>Missões</b><br>📜 ${S.done} concluídas</span><span><b>Equipe</b><br>🤝 ${(S.team||[]).length}/2 aliados</span><span><b>Condição</b><br>Fadiga ${S.fatigue||0}% · Reputação ${Math.floor(S.rep||0)}</span><span><b>Equipamento</b><br>🩹 ${S.kit} kits · 💊 ${S.pill} pílulas</span></div>`+
 `<div class="status-attributes"><span><small>Ninjutsu</small><b>${S.nin}</b></span><span><small>Taijutsu</small><b>${S.tai}</b></span><span><small>Velocidade</small><b>${S.vel}</b></span><span><small>Inteligência</small><b>${S.int}</b></span><span><small>Carisma</small><b>${S.car}</b></span></div>`;
-$('#pn').innerHTML=V[mode]();const modal=$('#urgentModal'),wasHidden=modal.hidden,urgentPending=!!(S.urgent&&!S.urgent.response&&!S.assignment&&!M&&!B&&!X);modal.hidden=!urgentPending;modal.innerHTML=urgentPending?`<div class="urgent-shade"><section class="urgent-dialog" role="alertdialog" aria-modal="true" aria-labelledby="urgentTitle" tabindex="-1"><span class="urgent-kicker">Decisão urgente · chamado da vila</span><h2 id="urgentTitle">${esc(S.urgent.title)}</h2><p>${esc(S.urgent.description)}</p><p>${crisisInfo(S.urgent)}</p><p class="urgent-deadline">Destino: ${esc(L[S.urgent.loc][1])} · prazo restante: ${S.urgent.daysLeft} dia(s)</p><p>Escolha como responder. Atender agora inicia a missão imediatamente; o apoio da equipe tem resultado e riscos próprios.</p><div class="g">${btn('Atender agora<small>Vá direto ao local e inicie a missão.</small>',"chooseUrgent('self')",'p')}${btn('Pedir ajuda à equipe<small>Aliados disponíveis melhoram a chance; uma falha pode feri-los. Sem equipe disponível, uma patrulha local assume.</small>','askUrgentTeam()')}${btn('Ignorar<small>O prazo continua; reputação e pessoas podem sofrer.</small>',"chooseUrgent('ignored')")}</div></section></div>`:'';['#st','#log','#pn','#gm > .row'].forEach(selector=>{$(selector).inert=urgentPending});document.body.style.overflow=urgentPending?'hidden':'';if(urgentPending&&wasHidden)$('#urgentModal button')?.focus()}
+$('#pn').innerHTML=V[mode]();const modal=$('#urgentModal'),wasHidden=modal.hidden,urgentPending=!!(S.urgent&&!S.urgent.response&&!S.assignment&&!S.activeContract&&!M&&!B&&!X);modal.hidden=!urgentPending;modal.innerHTML=urgentPending?`<div class="urgent-shade"><section class="urgent-dialog" role="alertdialog" aria-modal="true" aria-labelledby="urgentTitle" tabindex="-1"><span class="urgent-kicker">Decisão urgente · chamado da vila</span><h2 id="urgentTitle">${esc(S.urgent.title)}</h2><p>${esc(S.urgent.description)}</p><p>${crisisInfo(S.urgent)}</p><p class="urgent-deadline">Destino: ${esc(L[S.urgent.loc][1])} · prazo restante: ${S.urgent.daysLeft} dia(s)</p><p>Escolha como responder. Atender agora inicia a missão imediatamente; o apoio da equipe tem resultado e riscos próprios.</p><div class="g">${btn('Atender agora<small>Vá direto ao local e inicie a missão.</small>',"chooseUrgent('self')",'p')}${btn('Pedir ajuda à equipe<small>Aliados disponíveis melhoram a chance; uma falha pode feri-los. Sem equipe disponível, uma patrulha local assume.</small>','askUrgentTeam()')}${btn('Ignorar<small>O prazo continua; reputação e pessoas podem sofrer.</small>',"chooseUrgent('ignored')")}</div></section></div>`:'';['#st','#log','#pn','#gm > .row'].forEach(selector=>{$(selector).inert=urgentPending});document.body.style.overflow=urgentPending?'hidden':'';if(urgentPending&&wasHidden)$('#urgentModal button')?.focus()}
 
 
 /* ===== Bloco 10: mundo vivo, treino com senseis, respeito, mortes e missões ===== */
@@ -802,7 +927,7 @@ function daySim(){const w=ew();
 Object.keys(w.hurt).forEach(id=>{const h=w.hurt[id];if(slot()<h.until)return;const med=['tsunade','shizune','haruka','sakura'].filter(i=>!w.dead[i]).length;if(h.grave&&MORTAL.includes(id)&&Math.random()<.14-.03*med)die(id,'não resistiu aos ferimentos');else{delete w.hurt[id];log(`🏥 ${N[id][0]} recebeu alta do hospital.`,'sys')}});
 Object.keys(w.away).forEach(id=>{const a=w.away[id];if(S.day>a.until)return delete w.away[id];const p={B:.03,A:.07,S:.12}[a.rank];if(p&&S.day>a.from&&Math.random()<p){const grave=a.rank!='B'&&Math.random()<.35;hurtNpc(id,grave);log(`🗣️ Notícia: ${N[id][0]} voltou ferido(a) de uma missão rank ${a.rank}${grave?' e o estado é grave':''}.`,'sys')}});
 Object.keys(AWAYR).forEach(id=>{if(!N[id]||w.dead[id]||w.away[id]||w.hurt[id]||S.assignment?.squad?.includes(id)||Math.random()>=AWAYR[id])return;w.away[id]={from:S.day,until:S.day+R(2,4),rank:P(['C','C','B','B','A'])}});
-if(S.urgent&&(S.assignment?.status=='active'||M||B||X)){S.urgent.daysLeft--;if(S.urgent.daysLeft<=0)missUrgent(S.urgent)}
+if(S.urgent&&(S.assignment?.status=='active'||S.activeContract||M||B||X)){S.urgent.daysLeft--;if(S.urgent.daysLeft<=0)missUrgent(S.urgent)}
 if(!S.hokage&&S.rk==3&&S.rep>=99.5&&S.fame>=60&&S.done>=45&&S.worldYears>=4&&S.lv>=20){S.hokage=true;log('🏯 <b>O conselho da vila e Tsunade reconhecem sua trajetória: você é nomeado(a) o Hokage de Konoha!</b>','ok')}}
 function tick(n=1){const d0=S.day;tick0(n);ew();if(S.day>d0)daySim()}
 const RCAP={D:22,C:42,B:62,A:82,S:100},RW={D:.2,C:.5,B:1.1,A:2.2,S:4};
@@ -814,14 +939,14 @@ const context=`${title} ${description}`.normalize('NFD').replace(/[\u0300-\u036f
 const civilianRisk=/civis|moradores|trabalhadores|comboio|caravana|comerciantes|construtor|equipe medica|equipe de obras|familia|aldeoes|viajantes|vidas em jogo|proteger a vila|konoha.{0,24}ataque/.test(context);
 const rescue=/resgat|resgate|batedor|equipe desaparecida|aliado|companheiro|kazekage/.test(context)||goal=='rescue';
 const noSetbacks=(progress.failures||0)==0;
-return{secondaryObjectives:Math.max(0,progress.secondaryObjectives||0),alliesSaved:progress.alliesSaved??((rescue||goal=='protect')&&!civilianRisk?1:0),civiliansProtected:progress.civiliansProtected??(noSetbacks&&civilianRisk?1:0),title,description,civilianRisk,rescue,failures:progress.failures||0}
+return{secondaryObjectives:Math.max(0,progress.secondaryObjectives||0),preparationSuccesses:Math.max(0,progress.preparationSuccesses||0),alliesSaved:progress.alliesSaved??((rescue||goal=='protect')&&!civilianRisk?1:0),civiliansProtected:progress.civiliansProtected??(noSetbacks&&civilianRisk?1:0),title,description,civilianRisk,rescue,failures:progress.failures||0}
 }
 function completeMission(rank,reward,xp,urgent,bonuses={}){
-const secondary=bonuses.secondaryObjectives||0,allies=bonuses.alliesSaved||0,civilians=bonuses.civiliansProtected||0,rate=Math.min(.5,secondary*.1+allies*.15+civilians*.1),bonusRyo=Math.round(reward*rate),bonusXp=Math.round(xp*rate);
+const secondary=bonuses.secondaryObjectives||0,preparation=bonuses.preparationSuccesses||0,allies=bonuses.alliesSaved||0,civilians=bonuses.civiliansProtected||0,preparationRate=Math.min(.2,preparation*.015),rate=Math.min(.5,secondary*.1+preparationRate+allies*.15+civilians*.1),bonusRyo=Math.round(reward*rate),bonusXp=Math.round(xp*rate);
 S.ryo+=reward+bonusRyo;gain(xp+bonusXp);S.done++;repGain(rank,urgent);
 const repBonus=secondary*.25+allies*.5+civilians*.5;if(repBonus)S.rep=Math.min(RCAP[rank]||100,Math.round(((S.rep||0)+repBonus)*100)/100);
 if(bonuses.title){if(bonuses.failures&&(bonuses.civilianRisk||bonuses.rescue))recordWorldEvent('failure',bonuses.title,'A missão teve contratempos e os envolvidos ainda comentam o resultado.');else if(civilians)recordWorldEvent('civilians',bonuses.title,'Civis foram protegidos sem contratempos.');else if(allies)recordWorldEvent('rescue',bonuses.title,'Um aliado foi resgatado com sucesso.');else recordWorldEvent('success',bonuses.title,'A missão foi concluída com sucesso.')}
-const bonusLabels=[];if(secondary)bonusLabels.push(`Objetivo secundário +${Math.round(secondary*10)}%`);if(allies)bonusLabels.push('Aliado resgatado +15%');if(civilians)bonusLabels.push('Civis protegidos +10%');
+const bonusLabels=[];if(secondary)bonusLabels.push(`Objetivo secundário +${Math.round(secondary*10)}%`);if(preparationRate)bonusLabels.push(`Preparação diária +${Math.round(preparationRate*100)}%`);if(allies)bonusLabels.push('Aliado resgatado +15%');if(civilians)bonusLabels.push('Civis protegidos +10%');
 return{ryo:reward+bonusRyo,xp:xp+bonusXp,bonusLabels}
 }
 const missionBonusText=payout=>payout.bonusLabels.length?` · bônus: ${payout.bonusLabels.join(', ')}`:'';
@@ -854,8 +979,18 @@ const MS0=MS.length;
 ['S','Operação estratégica','Um golpe decisivo contra uma organização que ameaça várias nações.','pain',1900,500,null,'Cada erro pode custar vidas.']
 ].forEach(x=>{MS.push(x.slice(0,7));MSTEP.push([x[7],DEFC])});
 V.ms=()=>{const story=storyState(),wk=Math.floor(S.day/4),lst=MS.map((m,i)=>({m,i})).filter(({m,i})=>!story.defeatedBosses[m[3]]&&hs('q',i,wk)<(i<MS0?.8:.6)&&(m[0]!='S'||S.rep>=REP_REQ.S)&&(m[0]!='A'||S.rk>=2)&&(S.rep||0)>=(REP_REQ[m[0]]||0));
-return campaignBoard()+'<h3>📜 Mural de missões</h3><small style="color:var(--mu)">Reputação elevada libera contratos B, A e S. Chefes vencidos na história deixam de reaparecer como contratos comuns.</small><div class="g" style="margin-top:8px">'+lst.sort((a,b)=>MSK.indexOf(a.m[0])-MSK.indexOf(b.m[0])).map(({m,i})=>{const r=m[0],repNeed=REP_REQ[r]||0,ok=S.rk>=NEED[r]&&S.lv>=LVN[r]&&(S.rep||0)>=repNeed,lk=ok?'':`🔒 ${RK[NEED[r]]}, nível ${LVN[r]}${(S.rep||0)<repNeed?`, reputação ${repNeed}+`:''}`,kind=m[6]?MTYPE[m[6]]:(EN[m[3]]?.[4]?'Combate contra chefe':'Combate');return btn(`${rkb(r)}${m[1]}<small>${m[2]}</small><small>${kind} · ${m[4]} ryo · ${m[5]} XP · respeito até ${RCAP[r]}${lk?' · '+lk:''}</small>`,ok?`smis(${i})`:`log('🔒 Requer ${RK[NEED[r]]}, nível ${LVN[r]} e reputação ${repNeed}+.' ,'sys')`,ok?'':'lock')}).join('')+back+'</div>'};
-function smis(i){if(M&&(mode=='mis'||mode=='goal'))return log('Você já está em uma missão.','sys');if(S.hp<=Math.ceil(S.mh*.2))return log('Você está ferido demais para partir. Descanse ou use um kit médico.','sys');smis0(i)}
+return campaignBoard()+'<h3>📜 Mural de missões</h3><small style="color:var(--mu)">Cada contrato exige uma rotina diária por 2 a 5 dias, conforme o rank, antes da etapa final. Reputação elevada libera contratos B, A e S. Chefes vencidos na história deixam de reaparecer como contratos comuns.</small><div class="g" style="margin-top:8px">'+lst.sort((a,b)=>MSK.indexOf(a.m[0])-MSK.indexOf(b.m[0])).map(({m,i})=>{const r=m[0],repNeed=REP_REQ[r]||0,ok=S.rk>=NEED[r]&&S.lv>=LVN[r]&&(S.rep||0)>=repNeed,lk=ok?'':`🔒 ${RK[NEED[r]]}, nível ${LVN[r]}${(S.rep||0)<repNeed?`, reputação ${repNeed}+`:''}`,kind=m[6]?MTYPE[m[6]]:(EN[m[3]]?.[4]?'Combate contra chefe':'Combate');return btn(`${rkb(r)}${m[1]}<small>${m[2]}</small><small>${missionDays(r)} dias de rotina + etapa final · ${kind} · ${m[4]} ryo · ${m[5]} XP · respeito até ${RCAP[r]}${lk?' · '+lk:''}</small>`,ok?`smis(${i})`:`log('🔒 Requer ${RK[NEED[r]]}, nível ${LVN[r]} e reputação ${repNeed}+.' ,'sys')`,ok?'':'lock')}).join('')+back+'</div>'};
+function smis(i){
+const mission=MS[i];
+if(!mission)return log('Esse contrato não existe.','sys');
+if(S.activeContract||M||B||X||S.assignment?.status=='active')return log('Conclua ou retome sua atividade atual antes de aceitar outro contrato.','sys');
+const rank=mission[0],requiredRank=NEED[rank],requiredLevel=LVN[rank],requiredRep=REP_REQ[rank]||0;
+if(S.rk<requiredRank||S.lv<requiredLevel||(S.rep||0)<requiredRep)return log(`🔒 Requer rank ${RK[requiredRank]}, nível ${requiredLevel} e reputação ${requiredRep}+.`,'sys');
+const story=storyState(),week=Math.floor(S.day/4),available=hs('q',i,week)<(i<MS0?.8:.6);
+if(story.defeatedBosses[mission[3]]||!available)return log('Este contrato não está disponível no mural hoje.','sys');
+if(S.hp<=Math.ceil(S.mh*.2))return log('Você está ferido demais para partir. Descanse ou use um kit médico.','sys');
+smis0(i)
+}
 const SENMAX={kakashi:{relampago:2,fogo:1},jiraiya:{fogo:2,terra:1,agua:2},tsunade:{terra:2,vento:1},yamato:{terra:2,agua:1},asuma:{vento:2,fogo:1},gaara:{terra:2},sasuke:{relampago:2,fogo:1},naruto:{vento:2}};
 Object.keys(SENMAX).forEach(id=>SEN[id]=Object.keys(SENMAX[id]));
 const TA=[30,40,55],TN=[6,10,16],TS=[1,2,3],CAP=()=>6+S.lv*2+S.rk*3;
@@ -902,7 +1037,7 @@ function updateBuildMode(){$('#elementChoice').hidden=document.querySelector('in
 updateBuildMode();
 if(ld())$('#ct').hidden=false;
 const show=()=>{$('#cr').hidden=true;$('#gm').hidden=false;render()};
-function cont(){const v=ld();S=Object.assign(fresh(v.n,v.a,v.el),v);S.pres={};S.team=Array.isArray(S.team)?S.team.filter(id=>N[id]).slice(0,2):[];[0,1,2].forEach(i=>S.lv>=[1,4,8][i]&&learn(S.el+':'+i));mode=S.assignment?.status=='active'?'assignment':'map';show();log('Você retoma sua jornada em Konoha.','sys')}
+function cont(){const v=ld();S=Object.assign(fresh(v.n,v.a,v.el),v);S.pres={};S.team=Array.isArray(S.team)?S.team.filter(id=>N[id]).slice(0,2):[];[0,1,2].forEach(i=>S.lv>=[1,4,8][i]&&learn(S.el+':'+i));mode=S.activeContract?'contract':S.assignment?.status=='active'?'assignment':'map';show();log(S.activeContract?`Você retoma a operação “${esc(S.activeContract.mission[1])}”.`:'Você retoma sua jornada em Konoha.','sys')}
 function newg(){if(confirm('Começar um novo jogo? O progresso atual será perdido.')){try{localStorage.removeItem(SV);localStorage.removeItem('naruto-rpg-v1')}catch(e){}location.reload()}}
 function start(){const n=$('#nm').value.trim()||'Shinobi',a=Math.min(40,Math.max(6,+$('#ag').value||12)),randomMode=document.querySelector('input[name=build]:checked').value=='random',el=randomMode?P(Object.keys(E)):document.querySelector('input[name=el]:checked').value,build=randomMode?P(BUILDS):null;
 S=fresh(n,a,el);if(a>=16)ST.forEach(k=>addStat(k,2));
@@ -913,5 +1048,199 @@ log(`🍃 Bem-vindo(a) a Konoha, <b>${esc(n)}</b>! Aos ${a} anos, você inicia a
 if(randomMode)log(`🎲 Seu destino foi sorteado: <b>${S.style}</b>, poder <b>${S.power}</b> e nível ${S.lv}.`,'bt');
 log(academyStudent()?`Você é <b>Estudante da Academia</b>. Complete ${ACADEMY_CLASS_COUNT} aulas práticas e passe no exame de graduação antes de sair da Academia.`:'Você já se formou como <b>Genin</b>. Vá à Torre do Hokage para pegar missões!','sys');
 log('Dica: clique em personagens para interagir, ou escreva livremente o que quer fazer. Missões vão de rank D a S, e os chefes só aparecem nas mais perigosas.','sys')}
+</script>
+<script>
+/* ===== EXPANSÃO: novos locais, mapa dinâmico, arcos paralelos e atividades ===== */
+Object.assign(L,{onsen:['♨️','Fontes Termais',['jiraiya','kurenai','anko']],monumento:['🪦','Monumento aos Heróis',['asuma','gai','genma']],arena:['🏟️','Arena de Duelos',['gai','genma','kiba']],cachoeira:['💧','Cachoeira do Silêncio',[]],chuva:['🌧️','Vila da Chuva',[]],nuvem:['⛈️','Vila da Nuvem',[]],nevoa:['🌫️','Vila da Névoa',[]],templo:['🏛️','Templo do Fogo',[]]});
+LOC_GROUPS[0][1].push('onsen','monumento','arena','cachoeira');LOC_GROUPS[1][1].push('chuva','nuvem','nevoa');LOC_GROUPS[2][1].push('templo');
+Object.assign(LOC_REQ,{onsen:{rk:1,done:2},monumento:{rk:1,done:3},arena:{rk:1,done:3},cachoeira:{rk:1,done:5},nevoa:{rk:2,done:10},nuvem:{rk:2,done:12},templo:{rk:2,done:9},chuva:{rk:3,done:20}});
+Object.assign(REG,{onsen:'k',monumento:'k',arena:'k',cachoeira:'k',chuva:'r',nuvem:'n',nevoa:'g',templo:'t'});
+Object.assign(ROUTE_HUB,{r:'chuva',n:'nuvem',g:'nevoa',t:'templo'});
+['chuva','nuvem','nevoa','templo'].forEach(k=>{ROUTE_LINKS[k]=['fronteira'];ROUTE_LINKS.fronteira.push(k)});
+Object.assign(EN,{itachi:['Itachi Uchiha, Sharingan da Akatsuki',560,34,'fogo',1],killerb:['Killer B, Jinchūriki das Oito Caudas',450,30,'relampago',1],hanzo:['Hanzō da Salamandra',520,33,'agua',1],kaguya:['Kaguya Ōtsutsuki, Deusa Coelho',1000,48,'',1]});
+/* ----- Arcos paralelos (abrem por requisitos próprios, sem depender da ordem principal) ----- */
+const OPT={int:'Analisar o terreno e o inimigo',tai:'Enfrentar com força e resistência',vel:'Surpreender com velocidade',nin:'Usar chakra e ninjutsu',car:'Coordenar e convencer os aliados'};
+const stg=(rank,title,description,key,reward,xp,sc,st)=>{const o={rank,title,description,reward,xp,scene:[sc,st.split(',').map(s=>[OPT[s],s])]};EN[key]?o.enemy=key:o.goal=key;return o};
+STORY_ARCS.push(
+{id:'floresta',free:1,title:'Paralelo · Sombras na Floresta da Morte',summary:'Sobreviva ao Portão 44 e encare o Sannin Serpente.',unlock:{rank:1,level:8,missions:5},consequence:'Orochimaru recua e a Floresta da Morte passa a ser patrulhada.',missions:[stg('C','Portão 44','Atravesse a floresta e proteja o pergaminho da equipe.','zaku',200,65,'Rugidos ecoam e um ninja do Som ataca por trás das árvores.','vel,int,tai'),stg('B','O sinal do Som','Detenha o ninja que persegue os candidatos.','dosu',280,95,'Dosu prepara ondas sonoras que embaralham seus sentidos.','int,nin,vel'),stg('A','A serpente nas sombras','Enfrente Orochimaru antes que ele marque a próxima vítima.','oro',460,160,'Uma serpente gigante surge e Orochimaru sorri entre as raízes.','int,nin,tai')]},
+{id:'akatsuki2',free:1,title:'Paralelo · Imortais da Akatsuki',summary:'Hidan e Kakuzu ameaçam as rotas comerciais.',unlock:{rank:2,level:14,missions:10},consequence:'Os caçadores de recompensas da Akatsuki são detidos e as rotas reabrem.',missions:[stg('A','Rastro dos imortais','Siga corpos e rituais até o esconderijo da dupla.','retrieve',420,150,'Símbolos de sangue marcam o chão em círculos perfeitos.','int,vel,nin'),stg('A','O ritual de Hidan','Impeça que Hidan complete o ritual.','hidan',520,185,'Hidan gargalha com a foice girando acima da cabeça.','vel,tai,nin'),stg('A','A dívida de Kakuzu','Derrote o caçador de recompensas de cinco corações.','kakuzu',580,205,'Fios negros costuram Kakuzu aos seus corações extras.','int,tai,vel')]},
+{id:'uchiha',free:1,title:'Paralelo · O Segredo do Clã Uchiha',summary:'Investigue o Distrito Uchiha e a sombra de Itachi.',unlock:{rank:2,level:16,missions:12},consequence:'A verdade sobre o massacre fica registrada nos arquivos da vila.',missions:[stg('B','Documentos proibidos','Recupere os registros guardados no Distrito Uchiha.','retrieve',380,130,'Um selo antigo protege a sala de arquivos secretos.','int,nin,vel'),stg('A','A sombra do distrito','Enfrente o ninja que vigia os arquivos.','akat',460,160,'Um ninja de capa negra bloqueia a saída entre os telhados.','vel,tai,nin'),stg('S','O corvo de olhos rubros','Enfrente Itachi e descubra o que ele esconde.','itachi',760,270,'Corvos giram no ar e o Sharingan de Itachi encontra seus olhos.','int,nin,car')]},
+{id:'nuvem',free:1,title:'Paralelo · Os Oito Caudas',summary:'Viaje à Vila da Nuvem e encontre Killer B.',unlock:{rank:3,level:20,missions:22},consequence:'A Vila da Nuvem se torna aliada e Killer B reconhece sua força.',missions:[stg('A','Escolta diplomática','Escolte o emissário até a Vila da Nuvem.','escort',560,200,'Trovões cortam o céu e mercenários cercam a comitiva.','tai,vel,car'),stg('A','Mercenários da tempestade','Dissolva a emboscada nas montanhas.','akat',600,215,'Raios caem em sequência e a trilha desmorona.','vel,nin,int'),stg('S','O rap do Jinchūriki','Prove seu valor contra Killer B.','killerb',820,295,'Killer B rima, gira as espadas e o chakra explode ao redor.','vel,tai,nin')]},
+{id:'chuva',free:1,title:'Paralelo · A Chuva Que Não Cessa',summary:'Liberte a Vila da Chuva da sombra de Hanzō.',unlock:{rank:3,level:24,missions:28},consequence:'A chuva cessa sobre a vila, e Ame renasce como aliada.',missions:[stg('A','Prisioneiros de Ame','Resgate civis presos nas torres da Chuva.','rescue',640,230,'A chuva abafa passos e todas as torres parecem iguais.','int,vel,nin'),stg('S','O guardião das torres','Derrube o imortal que protege o acesso.','hidan',700,255,'Hidan surge das sombras e ri sob a chuva.','tai,vel,nin'),stg('S','A Salamandra de Ame','Enfrente Hanzō e liberte a vila.','hanzo',900,320,'Hanzō ergue a foice envenenada e a salamandra ruge atrás dele.','int,tai,car')]},
+{id:'epilogo',free:1,after:'guerra',title:'Epílogo · A Deusa Coelho',summary:'O confronto final pelo destino do mundo shinobi.',unlock:{rank:3,level:30,missions:38},consequence:'O mundo shinobi entra em uma era de paz duradoura. Sua lenda está escrita.',missions:[stg('S','Escudo da Aliança','Proteja os esquadrões contra o ataque final.','protect',1100,380,'O céu se parte e a Lua parece observar cada movimento.','int,tai,car'),stg('S','O último rival','Detenha Tobi antes que ele alcance a Lua.','obito',1300,430,'Obito reúne chakra das dez caudas diante do campo de batalha.','vel,nin,car'),stg('S','Deusa Coelho','Enfrente Kaguya e encerre a era das guerras.','kaguya',1700,560,'Kaguya flutua sobre dimensões que se dobram ao seu redor.','int,nin,vel')]});
+const _sao=storyArcOpen,_slr=storyLockReason;
+storyArcOpen=i=>{const a=STORY_ARCS[i];if(!a.free)return _sao(i);const r=a.unlock;return(!a.after||storyState().completed[a.after])&&S.rk>=r.rank&&S.lv>=r.level&&S.done>=r.missions};
+storyLockReason=i=>{const a=STORY_ARCS[i],r=a.unlock;if(!a.free)return _slr(i);return a.after&&!storyState().completed[a.after]?`Conclua o arco “${a.after}” primeiro.`:`Requer rank ${RK[r.rank]}, nível ${r.level} e ${r.missions} missões concluídas.`};
+/* ----- Mapa-múndi dinâmico ----- */
+const MP={academia:[45,95],ichiraku:[115,45],mercado:[195,55],hospital:[270,95],treino:[40,215],torre:[160,190],floresta:[60,330],distrito:[145,375],onsen:[230,335],cachoeira:[300,290],monumento:[290,185],arena:[225,255],posto:[100,275],portao:[355,235],fronteira:[455,235],vale:[380,330],exame:[400,130],som:[470,95],santuario:[400,45],akatsuki:[560,55],onda:[565,160],ponte:[650,130],areia:[610,330],hospitalareia:[690,270],monte:[500,375],chuva:[690,45],nuvem:[640,215],nevoa:[540,285],templo:[330,395]};
+let selLoc=null;
+const lockedLoc=k=>{const q=LOC_REQ[k];return q&&(S.rk<q.rk||S.done<q.done)};
+function selectLoc(k){selLoc=selLoc==k?null:k;render()}
+function travelTo(k){
+if(!L[k])return log('Esse destino não existe no mapa.','sys');
+if(academyStudent()&&k!='academia')return go(k);
+if(lockedLoc(k))return go(k);
+const path=routePath(S.loc,k);
+if(!path)return log('Não há uma rota conhecida para esse destino.','sys');
+if(path.length<2)return log('Você já está nesse local.','sys');
+const distance=path.length-1;
+mode='map';
+for(let i=1;i<path.length;i++){
+S.loc=path[i];
+tick(1);
+}
+log(`🚶 Você chegou a <b>${L[k][1]}</b> após ${distance} ${distance==1?'período':'períodos'} de viagem.`,'sys');
+if(Math.random()<.25)ev();
+if(distance>1&&Math.random()<.3&&!B){
+log('⚠️ Você é emboscado(a) na estrada!','bad');
+fight(EN[P(['ladrao','lobo','renegado'])]);
+return
+}
+selLoc=null;save();render()
+}
+function mapSVG(){
+const highlighted=new Set(),path=selLoc?routePath(S.loc,selLoc):null;
+if(path)for(let i=0;i<path.length-1;i++)highlighted.add(path[i]+'>'+path[i+1]),highlighted.add(path[i+1]+'>'+path[i]);
+const seen=new Set();let edges='';
+Object.keys(MP).forEach(from=>routeNeighbors(from).forEach(to=>{
+const edgeKey=[from,to].sort().join('|');
+if(!MP[to]||seen.has(edgeKey))return;
+seen.add(edgeKey);const local=REG[from]==REG[to];
+edges+=`<line class="me ${local?'local':''} ${highlighted.has(from+'>'+to)?'hl':''}" x1="${MP[from][0]}" y1="${MP[from][1]}" x2="${MP[to][0]}" y2="${MP[to][1]}"/>`
+}));
+const regions=`<path class="mz" d="M14 125 Q26 60 130 62 L315 74 Q382 102 386 183 L361 296 Q337 393 238 410 L52 418 Q6 362 14 125Z"/><text class="mt" x="28" y="32">KONOHA</text><path class="mz2" d="M388 24 Q485 10 580 30 L704 60 Q727 96 705 185 L667 252 Q611 279 551 253 L451 254 Q407 208 388 24Z"/><text class="mt" x="470" y="24">FRONTEIRAS E PAÍSES</text><path class="mz" d="M378 265 Q461 244 555 267 L716 264 Q737 321 710 410 L548 418 L428 399 Q381 356 378 265Z"/><text class="mt" x="600" y="407">PAÍSES ALIADOS</text>`;
+const nodes=Object.keys(MP).map(key=>{
+const[x,y]=MP[key],people=pres(key).length,locked=!!lockedLoc(key),urgent=!!(S.urgent&&S.urgent.loc==key),selected=key==selLoc,current=key==S.loc;
+const cls=[current?'cur':'',locked?'lk':'',urgent?'urg':'',selected?'sel':''].join(' ');
+const label=`${L[key][1]}${current?' · sua localização atual':''}${selected?' · destino selecionado':''}${locked?' · bloqueado':''}${urgent?' · chamado urgente':''} · ${people} pessoa(s)`;
+return`<g class="mn ${cls}" role="button" tabindex="0" aria-label="${label}" onclick="selectLoc('${key}')" onkeydown="if(event.key=='Enter'||event.key==' '){event.preventDefault();selectLoc('${key}')}" aria-pressed="${selected}"><title>${label}</title><circle cx="${x}" cy="${y}" r="18"/><text class="em" x="${x}" y="${y+5}">${L[key][0]}</text><text class="lb" x="${x}" y="${y+31}">${L[key][1]}</text><circle cx="${x+14}" cy="${y-14}" r="8" style="fill:var(--lv);stroke:#111820;stroke-width:1.5"/><text class="bd" x="${x+14}" y="${y-11}">${people}</text></g>`
+}).join('');
+return`<svg class="wmap" viewBox="0 0 740 430" role="group" aria-label="Mapa interativo do mundo shinobi">${regions}${edges}${nodes}</svg>`
+}
+function mapLegend(){return`<div class="map-legend" aria-label="Legenda do mapa"><span><i class="map-dot current"></i>Você está aqui</span><span><i class="map-dot selected"></i>Destino selecionado</span><span><i class="map-dot urgent"></i>Chamado urgente</span><span><i class="map-dot"></i>Local disponível</span><span><i class="map-dot locked"></i>Bloqueado</span><span>🩷 Número: pessoas presentes</span></div>`}
+function mapPanel(){
+if(!selLoc)return`<div class="world"><b>Você está em ${L[S.loc][0]} ${L[S.loc][1]}.</b><br><small>Selecione um ponto do mapa para ver disponibilidade e rota.</small></div>`;
+const key=selLoc,route=routePath(S.loc,key),requirement=LOC_REQ[key],locked=!!lockedLoc(key),people=pres(key),current=key==S.loc,unreachable=!route;
+const routeText=current?'Você já está neste local.':route?`Rota: ${route.map(location=>L[location][1]).join(' → ')} · ${route.length-1} trecho(s), ${route.length-1} período(s) de viagem (aprox. ${Math.ceil((route.length-1)/3)} dia(s))`: 'Não há rota conectada a este local.';
+const accessText=locked&&requirement?`Acesso bloqueado · requer rank ${RK[requirement.rk]} e ${requirement.done} missão(ões) concluída(s).`:current?'Destino atual':unreachable?'Rota indisponível':`Disponível para viagem · ${Math.max(0,people.length)} pessoa(s) no local.`;
+const action=locked?btn(`🔒 Requer ${RK[requirement.rk]} · ${requirement.done} missão(ões)`,`log('🔒 Este local ainda está bloqueado pelos requisitos de rank e missões.','sys')`,'lock'):unreachable?btn('Rota indisponível',"log('Não há rota conhecida para este local.','sys')",'lock'):current?btn('Você já está aqui',"log('Você já está neste local.','sys')",'lock'):btn('Viajar para cá',`travelTo('${key}')`,'p');
+return`<div class="world"><div class="map-heading"><b>${L[key][0]} ${L[key][1]}</b><small>${current?'📍 Local atual':locked?'🔒 Bloqueado':`👥 ${people.length} pessoa(s)`}</small></div><p><small>${routeText}</small></p><small>${accessText}${route&&route.length>2&&!current?' · viagem longa: 30% de chance de emboscada':''}</small><div class="row">${action}</div></div>`
+}
+/* ----- Atividades por local ----- */
+const fat=n=>S.fatigue=Math.min(100,(S.fatigue||0)+n),heal=n=>S.hp=Math.min(S.mh,S.hp+n),rep1=()=>S.rep=Math.min(100,(S.rep||0)+1),WATER=['onda','ponte','cachoeira','nevoa','onsen'];
+const ACTS=[
+['onsen','♨️ Banho termal','20 ryō · zera a fadiga e cura',()=>{if(S.ryo<20)return log('Você não tem ryō suficiente.','sys');S.ryo-=20;S.fatigue=0;S.hp=S.mh;S.ck=Math.min(S.mc,S.ck+20);return'Você relaxa nas águas quentes e se sente renovado(a).'}],
+['cachoeira','💧 Meditar sob a cachoeira','Chakra cheio · chance rara de +1 chakra máximo',()=>{S.ck=S.mc;fat(5);gain(15);if(Math.random()<.06){S.mc++;return'Sua mente silencia: o chakra máximo aumentou em 1! (+15 XP)'}return'A água gelada clareia sua mente. (+15 XP)'}],
+['arena','⚔️ Duelo amistoso','Combate contra um duelista da arena',()=>{fight(['Duelista da Arena',50+S.lv*9,6+S.lv,P(['','fogo','agua','vento'])]);return-1}],
+['monumento','🕯️ Homenagear os heróis','+1 reputação · +8 XP',()=>{rep1();gain(8);return'Você lê os nomes gravados e reflete sobre o Fogo da Vontade.'}],
+['floresta','🌿 Coletar ervas e caçar','Ryō e chance de kit médico',()=>{fat(8);const y=R(20,55);S.ryo+=y;if(Math.random()<.3){S.kit++;return`Você vende caça (+${y} ryō) e prepara um kit médico.`}return`Você vende caça e ervas por ${y} ryō.`}],
+['mercado','📦 Bico de entregador','25–50 ryō',()=>{fat(6);const y=R(25,50);S.ryo+=y;return`Você entrega pacotes pela vila e ganha ${y} ryō.`}],
+['torre','🗂️ Ajudar na papelada','+30 ryō · +1 reputação',()=>{S.ryo+=30;rep1();return'Shizune agradece a ajuda com os relatórios.'}],
+['portao','🛡️ Patrulhar o portão','+1 reputação · +12 XP · pode haver combate',()=>{rep1();gain(12);fat(6);if(Math.random()<.2){fight(EN[P(['ladrao','lobo'])]);return-1}return'A patrulha termina sem incidentes.'}],
+['hospital','🩺 Voluntariar-se','+1 reputação · +15 ryō · +10 XP',()=>{rep1();S.ryo+=15;gain(10);return'Você ajuda a cuidar dos feridos.'}],
+['ichiraku','🍜 Desafio das tigelas','15 ryō · cura bastante',()=>{if(S.ryo<15)return log('Você não tem ryō suficiente.','sys');S.ryo-=15;heal(50);fat(-10);if(Math.random()<.05){S.mh++;return'Teuchi aplaude! Sua vitalidade máxima aumentou em 1.'}return'Você devora o ramen e recupera as forças!'}],
+[WATER,'🎣 Pescar','15–35 ryō · chance de pílula',()=>{fat(4);const y=R(15,35);S.ryo+=y;if(Math.random()<.15){S.pill++;return`Você pesca uma carpa dourada: +${y} ryō e uma pílula!`}return`Boa pescaria: +${y} ryō.`}],
+[['chuva','nuvem','nevoa','templo'],'🧭 Investigar a região','Rumores, ryō ou encontros',()=>{const r=Math.random();if(r<.25){fight(EN[P(['renegado','kiri','som'])]);return-1}if(r<.55){const y=R(40,90);S.ryo+=y;return`Você faz um trabalho local por ${y} ryō.`}gain(25);return'Moradores contam histórias e rumores da guerra. (+25 XP)'}],
+['*','🧭 Explorar os arredores','Pode render ryō, itens, XP ou combate',()=>{const r=Math.random();if(r<.2){fight(EN[P(['ladrao','lobo','renegado'])]);return-1}if(r<.5){const y=R(20,60);S.ryo+=y;fat(5);return`Você encontra uma bolsa esquecida: +${y} ryō.`}if(r<.65){S.kit++;return'Entre as pedras, você acha um kit médico.'}gain(15);return'Você descobre uma trilha antiga. (+15 XP)'}]];
+const actHere=()=>ACTS.map((a,i)=>({a,i})).filter(({a})=>a[0]=='*'||a[0]==S.loc||Array.isArray(a[0])&&a[0].includes(S.loc));
+function doAct(i){S.acts=S.acts||{};if(S.acts[i]==S.day)return log('Você já fez isso hoje. Volte amanhã.','sys');if(academyStudent())return log('📚 Conclua a Academia antes.','sys');const res=ACTS[i][3]();if(!res)return render();S.acts[i]=S.day;tick(1);if(res!==-1)log(res,'ok');save();render()}
+const actsView=()=>`<h3>🎯 Atividades em ${L[S.loc][1]}</h3><small style="color:var(--mu)">Cada atividade pode ser feita uma vez por dia e consome um período.</small><div class="g" style="margin-top:8px">`+actHere().map(({a,i})=>btn(`${a[1]}<small>${a[2]}</small><small>${(S.acts||{})[i]==S.day?'✔ Já feito hoje':'Disponível'}</small>`,`doAct(${i})`,(S.acts||{})[i]==S.day?'lock':'')).join('')+'</div>';
+/* ----- Integração com a tela do mapa ----- */
+const _vMap=V.map;
+V.map=function(){const wasAct=mapTab=='act';if(wasAct)mapTab='action';let h;try{h=_vMap()}finally{if(wasAct)mapTab='act'}
+h=h.replace('</nav>',`<button class="b category-tab ${wasAct?'cat-active':''}" onclick="mapTab='act';render()">🎯 Fazer</button></nav>`);
+if(wasAct){h=h.replace(' cat-active','').replace(`<button class="b category-tab  cat-active"`,'<button class="b category-tab"');const c=h.indexOf('<h3>✍️');return h.slice(0,c)+actsView()}
+return h.replace('<h4>Explorar locais</h4>','<div class="map-heading"><h4>🗺️ Mapa de viagem</h4><small>Dia '+S.day+' · Saída: '+L[S.loc][1]+'</small></div><p><small style="color:var(--mu)">Clique ou toque em um marcador para selecionar o destino. O caminho e os requisitos aparecem logo abaixo.</small></p>'+mapLegend()+mapSVG()+mapPanel())};
+
+/* ----- Progressão de estilos shinobi e transparência dos vínculos ----- */
+const STYLE_BOOK=[
+{id:'taijutsu',name:'Taijutsu de Konoha',master:'lee',stat:'tai',affinity:15,level:2,missions:1,cost:60,description:'Golpes precisos e pressão constante.'},
+{id:'ninjutsu',name:'Ninjutsu Elemental',master:'kakashi',stat:'nin',affinity:20,level:3,missions:2,cost:100,description:'Controle de chakra aplicado ao combate.'},
+{id:'strategist',name:'Estratégia de Equipe',master:'shikamaru',stat:'int',affinity:15,level:2,missions:1,cost:70,description:'Leitura do campo e decisões calculadas.'},
+{id:'tracker',name:'Rastreamento Shinobi',master:'kiba',stat:'vel',affinity:15,level:2,missions:1,cost:70,description:'Movimentação ágil e leitura de rastros.'}
+];
+function ensureStyleState(){
+if(!Array.isArray(S.styles))S.styles=['Equilibrado'];
+S.styles=[...new Set(['Equilibrado',...S.styles.filter(id=>id=='Equilibrado'||STYLE_BOOK.some(style=>style.id==id))])];
+if(!S.styles.includes(S.combatStyle))S.combatStyle='Equilibrado';
+return S.styles
+}
+function styleTestBonus(stat){
+ensureStyleState();
+const style=STYLE_BOOK.find(entry=>entry.id==S.combatStyle);
+return style?.stat==stat?2:0
+}
+function combatStyleName(){
+ensureStyleState();
+return STYLE_BOOK.find(entry=>entry.id==S.combatStyle)?.name||'Equilibrado'
+}
+function missionTestPreview(stat,dc,team=teamBonus(stat)){
+const bonus=team+styleTestBonus(stat),required=dc-(S[stat]||0)-bonus;
+const chance=Math.max(0,Math.min(100,(21-Math.max(1,required))*5));
+return `chance ~${chance}% · você ${S[stat]||0}${bonus?` + bônus ${bonus}`:''} vs CD ${dc}`
+}
+function styleTraining(id){
+const style=STYLE_BOOK.find(entry=>entry.id==id),known=ensureStyleState();
+if(!style||style.master!=T)return log('Este mestre não ensina esse estilo.','sys');
+if(known.includes(id)){
+S.combatStyle=id;save();
+log(`🥋 Estilo equipado: <b>${style.name}</b>. Bônus de +2 em ${style.stat.toUpperCase()} nos testes de missão.`,'ok');
+return render()
+}
+const missing=[];
+if((S.rel[T]||0)<style.affinity)missing.push(`afinidade ${style.affinity}`);
+if(S.lv<style.level)missing.push(`nível ${style.level}`);
+if(S.done<style.missions)missing.push(`${style.missions} missão(ões) concluída(s)`);
+if(S.ryo<style.cost)missing.push(`${style.cost} ryō`);
+if((S.fatigue||0)>=70)missing.push('fadiga abaixo de 70%');
+if(missing.length)return log(`Ainda falta: ${missing.join(', ')}.`,'sys');
+S.ryo-=style.cost;
+S.fatigue=Math.min(100,(S.fatigue||0)+10);
+S.styles.push(id);S.combatStyle=id;
+remember(T,'treino',`Aprendeu o estilo ${style.name} com ${N[T][0]}.`,{affinity:2,trust:1,respect:1,mentorship:1});
+gain(12);
+log(`📘 <b>${style.name}</b> aprendido e equipado! +2 em ${style.stat.toUpperCase()} nos testes de missão. (-${style.cost} ryō)`,'ok');
+tick(1);save();render()
+}
+function vStyles(){
+ensureStyleState();
+const style=STYLE_BOOK.find(entry=>entry.id==S.combatStyle);
+const master=N[T];
+const options=STYLE_BOOK.filter(entry=>entry.master==T);
+return `<h3>📘 Estilos de combate</h3><div class="world">Estilo equipado: <b>${style?.name||'Equilibrado'}</b>${style?` · +2 ${style.stat.toUpperCase()} em testes de missão`:''}<br><small>Você pode trocar entre estilos aprendidos sem custo. Para aprender outro, treine com o mestre responsável.</small></div><h4>Aprendizado com ${master?.[0]||'um mestre'}</h4><div class="g">${options.map(entry=>{
+const known=S.styles.includes(entry.id),equipped=S.combatStyle==entry.id,ready=(S.rel[T]||0)>=entry.affinity&&S.lv>=entry.level&&S.done>=entry.missions&&S.ryo>=entry.cost&&(S.fatigue||0)<70;
+const requirement=`Afinidade ${entry.affinity} · nível ${entry.level} · ${entry.missions} missão(ões) · ${entry.cost} ryō`;
+const label=`${equipped?'✔ ':''}${entry.name}<small>${entry.description}</small><small>${known?equipped?'Equipado':'Aprendido · +2 '+entry.stat.toUpperCase():`${requirement} · +2 ${entry.stat.toUpperCase()}`}</small>`;
+return btn(label,equipped?`log('Este estilo já está equipado.','sys')`:`styleTraining('${entry.id}')`,equipped?'lock':known||ready?'':'lock')
+}).join('')||'<small>Este personagem ainda não ensina um estilo de combate.</small>'}</div><div class="row">${btn('↩️ Voltar ao personagem',"mode='npc';render()")}</div>`
+}
+V.styles=vStyles;
+const previousNpcView=V.npc;
+V.npc=()=>{
+let html=previousNpcView();
+const id=T,affinity=S.rel[id]||0,bond=bondOf(id);
+const next=affinity<15?'treino com orientação (15)':affinity<20?'formar equipe (20)':affinity<30?'encontros (30)':affinity<40?'aprender jutsu básico (40)':affinity<55?'aprender jutsu avançado (55)':'novos momentos juntos';
+const bondPanel=`<h4>Vínculo</h4><div class="status-bars">${bar('💞 Afinidade',Math.max(0,Math.min(100,affinity)),100,'lv')}${bar('🤝 Confiança',Math.max(0,Math.min(10,bond.trust)),10,'ck')}${bar('⭐ Respeito',Math.max(0,Math.min(10,bond.respect)),10,'ac')}</div><small style="color:var(--mu)">Afinidade ${affinity}/100 · ${bondLabel(id)} · próximo marco: ${next}.</small>`;
+const styleButton=STYLE_BOOK.some(style=>style.master==id)?btn('📘 Aprender estilo de combate<small>Treino com mestre · bônus de +2 em uma especialidade</small>',"mode='styles';render()"):'';
+return html.replace('<h4>Interações</h4><div class="g">',`${bondPanel}<h4>Interações</h4><div class="g">${styleButton}`)
+};
+V.sen=()=>{
+const id=T,n=N[id],offerings=SENMAX[id]||{},elements=Object.keys(offerings);
+const cards=elements.map(element=>`<h4>${E[element][1]} ${E[element][0]} · até ${E[element][3][offerings[element]]}</h4><div class="g">`+[0,1,2].filter(level=>level<=offerings[element]).map(level=>{
+const key=`${element}:${level}`,known=S.jt.includes(key),progress=S.lp[key]||0,cost=Math.ceil(TC[level]/TS[level]),missing=[];
+if((S.rel[id]||0)<TA[level])missing.push(`afinidade ${TA[level]}`);
+if(level>0&&!(S.jt.includes(`${element}:${level-1}`)&&mlv(`${element}:${level-1}`)>=level))missing.push(`maestria ${level} na técnica anterior`);
+if(!els().includes(element)&&els().length>=Math.max(1,S.rk))missing.push(`limite de ${Math.max(1,S.rk)} elemento(s) do seu rank`);
+if(S.lv<TL[level])missing.push(`nível ${TL[level]}`);
+if(S.nin<TN[level])missing.push(`Nin ${TN[level]}`);
+if((S.fatigue||0)>=70)missing.push('fadiga abaixo de 70%');
+if(S.ryo<cost)missing.push(`${cost} ryō por sessão`);
+if(S.cd['sen'+id]===slot())missing.push('próximo período para treinar');
+const chance=Math.round(Math.min(.95,.5+(n[4][1]/18)*.25+(S.nin-TN[level])*.03)*100);
+const status=known?'✔ Dominado':missing.length?`🔒 Falta ${missing.join(' · ')}`:`📖 Pronto · ${progress}/${TS[level]} sessões · chance ${chance}% por sessão`;
+return btn(`${known?'✔ ':''}${E[element][3][level]}<small>${status}</small><small>${known?`Maestria ${mlv(key)}/5`:`${cost} ryō por sessão · ${TS[level]} sessão(ões) para dominar`}</small>`,known?`log('Você já domina esta técnica.','sys')`:`teach('${key}')`,known?'lock':missing.length?'lock':'p')
+}).join('')+'</div>').join('');
+return `<h3>🎓 Aprender técnicas com ${n[0]}</h3><div class="world">Afinidade ${S.rel[id]||0} · Nin ${S.nin} · nível ${S.lv} · fadiga ${S.fatigue||0}% · ryō ${S.ryo}. Cada sessão custa ryō, avança o tempo e pode aumentar o progresso; a chance é exibida em cada técnica.</div>${cards||'<p>Este personagem não tem técnicas para ensinar.</p>'}<div class="row">${btn('↩️ Voltar ao personagem',"mode='npc';render()")}</div>`
+};
 </script></body></html>
  
