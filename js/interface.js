@@ -154,7 +154,7 @@ function vMap() {
     ["act", "🎯 Fazer"],
   ];
   const nav = `<nav class="category-nav" aria-label="Categorias de ações">${tabs.map(([key, label]) => `<button class="b category-tab ${mapTab == key ? "cat-active" : ""}" aria-pressed="${mapTab == key}" onclick="mapTab='${key}';render()">${label}</button>`).join("")}</nav>`;
-  const mapaViagem = `<div class="map-heading"><h4>🗺️ Mapa de viagem</h4><small>Dia ${S.day} · Saída: ${L[S.loc][1]}</small></div>${consequencePanel()}<p><small style="color:var(--mu)">Clique ou toque em um marcador para selecionar o destino. O caminho e os requisitos aparecem logo abaixo.</small></p>${mapLegend()}${mapSVG()}${mapPanel()}`;
+  const mapaViagem = `<div class="map-heading"><h4>🗺️ Mapa de viagem</h4><small>Dia ${S.day} · Saída: ${L[S.loc][1]}</small></div>${consequencePanel()}<p><small style="color:var(--mu)">Toque em um marcador para selecionar o destino. Em telas pequenas, deslize o mapa na horizontal. O caminho e os requisitos aparecem logo abaixo.</small></p>${mapLegend()}${mapSVG()}${mapPanel()}`;
   let content = "";
   if (mapTab == "places")
     content = `<h3>${L[S.loc][0]} ${L[S.loc][1]}</h3><div class="world">🌦️ ${S.season || "Primavera"} · ${S.weather || "Céu limpo"} · Reputação da vila: ${Math.floor(S.rep || 0)}/100</div><h4>Pessoas por perto</h4><div class="g">${people || "<small>Ninguém está por aqui agora.</small>"}</div>${mapaViagem}`;
@@ -241,8 +241,10 @@ function vMap() {
         : "") +
       "</div>";
   else if (mapTab == "act") content = actsView();
-  else
-    content = `<h3>✍️ Ação livre</h3><p>Converse com alguém por perto ou descreva uma atividade.</p><div class="row"><input type="text" id="fr" placeholder="Ex.: conversar com Naruto, comer ramen ou explorar" onkeydown="if(event.key=='Enter')fr()">${btn("Executar", "fr()", "p")}</div>`;
+  else {
+    const nearby = pres(S.loc);
+    content = `<h3>✍️ Ação livre</h3><p>Escreva uma ação ou escolha um exemplo para executá-lo imediatamente. Algumas ações avançam o tempo.</p><div class="row"><input type="text" id="fr" placeholder="Ex.: treinar, dormir, comer ramen ou explorar" aria-label="Descreva uma ação" onkeydown="if(event.key=='Enter')fr()">${btn("Executar", "fr()", "p")}</div><h4>Exemplos rápidos</h4><div class="g">${FREE_TEXT_EXAMPLES.map(([label], index) => btn(label, `runFreeTextExample(${index})`)).join("")}</div>${nearby.length ? `<h4>Conversar com alguém por perto</h4><div class="g">${nearby.map((id, index) => btn(`💬 ${N[id][0]}<small>Iniciar uma conversa</small>`, `talkToNearbyExample(${index})`)).join("")}</div>` : ""}`;
+  }
   return (
     incident +
     fillerEventPanel() +
@@ -854,10 +856,10 @@ function mapSVG() {
         selected ? "sel" : "",
       ].join(" ");
       const label = `${L[key][1]}${current ? " · sua localização atual" : ""}${selected ? " · destino selecionado" : ""}${locked ? " · bloqueado" : ""}${urgent ? " · chamado urgente" : ""} · ${people} pessoa(s)`;
-      return `<g class="mn ${cls}" role="button" tabindex="0" aria-label="${label}" onclick="selectLoc('${key}')" onkeydown="if(event.key=='Enter'||event.key==' '){event.preventDefault();selectLoc('${key}')}" aria-pressed="${selected}"><title>${label}</title><circle cx="${x}" cy="${y}" r="18"/><text class="em" x="${x}" y="${y + 5}">${L[key][0]}</text><text class="lb" x="${x}" y="${y + 31}">${L[key][1]}</text><circle cx="${x + 14}" cy="${y - 14}" r="8" style="fill:var(--lv);stroke:#111820;stroke-width:1.5"/><text class="bd" x="${x + 14}" y="${y - 11}">${people}</text></g>`;
+      return `<g class="mn ${cls}" role="button" tabindex="0" aria-label="${label}" onclick="selectLoc('${key}')" onkeydown="if(event.key=='Enter'||event.key==' '){event.preventDefault();selectLoc('${key}')}" aria-pressed="${selected}"><title>${label}</title><circle class="mn-hit" cx="${x}" cy="${y}" r="27"/><circle class="mn-marker" cx="${x}" cy="${y}" r="18"/><text class="em" x="${x}" y="${y + 5}">${L[key][0]}</text><text class="lb" x="${x}" y="${y + 31}">${L[key][1]}</text><circle class="mn-count" cx="${x + 14}" cy="${y - 14}" r="8"/><text class="bd" x="${x + 14}" y="${y - 11}">${people}</text></g>`;
     })
     .join("");
-  return `<svg class="wmap" viewBox="0 0 740 430" role="group" aria-label="Mapa interativo do mundo shinobi">${regions}${edges}${nodes}</svg>`;
+  return `<div class="map-scroll" role="region" aria-label="Mapa interativo; deslize horizontalmente para explorar" tabindex="0"><svg class="wmap" viewBox="0 0 740 430" role="group" aria-label="Mapa interativo do mundo shinobi">${regions}${edges}${nodes}</svg></div>`;
 }
 
 function mapLegend() {
