@@ -1,4 +1,4 @@
-/* Relacionamentos: afinidade, vínculos, conversas, equipe, flerte e namoro. */
+/* Relações, convites de equipe, linhagens, filiações, conversas e romance. */
 
 const rl = (v) =>
   v < 0
@@ -32,6 +32,10 @@ function resolveSocial(index) {
   const id = S.socialEvent?.npc,
     scene = SOCIAL_SCENES[id],
     choice = scene?.choices[index];
+  if (!id || ew().dead[id]) {
+    S.socialEvent = null;
+    return log("O encontro foi cancelado; essa pessoa não está mais disponível.", "sys");
+  }
   if (!choice) return;
   const effect = SOCIAL_EFFECTS[choice[2]];
   remember(id, choice[2], choice[1], {
@@ -74,38 +78,155 @@ function ignoreSocial() {
   render();
 }
 
+function allyTestStat(id) {
+  const stat = N[id]?.[5]?.[0];
+  return stat == "mh" || ![...ST, "car"].includes(stat) ? "tai" : stat;
+}
+
 function teamBonus(stat) {
   return Math.min(
     4,
     (S.team || []).reduce(
-      (total, id) => total + (N[id]?.[5]?.[0] == stat ? 2 : 0),
+      (total, id) => total + (allyTestStat(id) == stat ? 2 : 0),
       0,
+    ),
+  );
+}
+
+const NPC_SOCIAL_PROFILES = {
+  iruka: { charisma: 8, openness: 9, guard: 15 },
+  naruto: { charisma: 8, openness: 8, guard: 18 },
+  sasuke: { charisma: 4, openness: 2, guard: 34 },
+  sakura: { charisma: 7, openness: 6, guard: 21 },
+  kakashi: { charisma: 7, openness: 4, guard: 26 },
+  tsunade: { charisma: 7, openness: 3, guard: 32 },
+  shikamaru: { charisma: 6, openness: 5, guard: 22 },
+  hinata: { charisma: 6, openness: 7, guard: 19 },
+  teuchi: { charisma: 7, openness: 10, guard: 12 },
+  gaara: { charisma: 6, openness: 4, guard: 27 },
+  obito: { charisma: 7, openness: 2, guard: 35 },
+  danzo: { charisma: 6, openness: 1, guard: 42 },
+};
+
+function npcSocialProfile(id) {
+  return NPC_SOCIAL_PROFILES[id] || { charisma: 5, openness: 5, guard: 24 };
+}
+
+function socialReception(id) {
+  const bond = bondOf(id),
+    profile = npcSocialProfile(id),
+    affinity = S.rel[id] || 0,
+    score =
+      (S.car - 5) * 1.8 +
+      ((S.rep || 0) - 20) * 0.12 +
+      affinity * 0.22 +
+      bond.trust * 1.5 +
+      bond.respect * 0.8 +
+      profile.charisma * 0.5;
+  return {
+    accepted:
+      affinity >= 0 && bond.trust >= -1
+        ? true
+        : score >= profile.guard,
+    score,
+    profile,
+  };
+}
+
+function rejectSocialContact(id) {
+  const result = socialReception(id);
+  if (result.accepted) return false;
+  log(
+    `<b>${N[id][0]}:</b> “Não quero conversar agora. Sua reputação e a forma como você se aproxima ainda não me dão confiança.” <small>(Carisma ${S.car} · reputação ${Math.floor(S.rep || 0)} · abertura ${result.profile.charisma}/10)</small>`,
+    "sys",
+  );
+  return true;
+}
+
+function teamInvitationChance(id) {
+  const bond = bondOf(id),
+    profile = npcSocialProfile(id);
+  return Math.max(
+    8,
+    Math.min(
+      92,
+      18 +
+        (S.rel[id] || 0) * 0.24 +
+        bond.trust * 3 +
+        bond.respect * 1.6 +
+        bond.sharedMissions * 5 +
+        (S.car - 5) * 2.5 +
+        (S.rep || 0) * 0.16 +
+        profile.openness -
+        bond.rivalry * 5,
     ),
   );
 }
 
 function toggleTeam(id) {
   S.team = S.team || [];
-  if ((S.rel[id] || 0) < 20)
-    return log(
-      `<b>${N[id][0]}</b> ainda não confia o bastante para entrar na equipe. (Afinidade 20)`,
-      "sys",
-    );
   if (S.team.includes(id)) {
     S.team = S.team.filter((member) => member != id);
     log(`${N[id][0]} saiu da equipe.`, "sys");
-  } else if (S.team.length >= 2)
+  } else return inviteToTeam(id);
+  render();
+}
+
+function inviteToTeam(id) {
+  if (!N[id] || ew().dead[id])
+    return log("Essa pessoa não pode entrar na equipe.", "sys");
+  S.team = S.team || [];
+  if (S.team.includes(id))
+    return log(`${N[id][0]} já faz parte da sua equipe.`, "sys");
+  if (S.team.length >= 2)
     return log(
       "A equipe já tem dois aliados. Remova alguém antes de escolher outro.",
       "sys",
     );
-  else {
-    S.team.push(id);
-    log(
-      `🤝 ${N[id][0]} entrou para sua equipe. Bônus em ${N[id][5][0].toUpperCase()}: +2 nos testes.`,
-      "ok",
+  if (where(id) != S.loc)
+    return log(
+      `${N[id][0]} não está por perto. Convites para uma equipe precisam ser feitos pessoalmente.`,
+      "sys",
     );
+  const bond = bondOf(id),
+    cooldown = S.teamInvites?.[id] || 0;
+  if (S.day < cooldown)
+    return log(
+      `${N[id][0]} pediu um tempo antes de considerar outro convite (até o dia ${cooldown}).`,
+      "sys",
+    );
+  if (
+    bond.trust < 1 &&
+    bond.sharedMissions < 1 &&
+    !((S.rep || 0) >= 50 && S.car >= 9)
+  )
+    return log(
+      `${N[id][0]} ainda não viu como você age sob pressão. Ganhe confiança com conversas, treinos ou uma missão em conjunto antes de convidar.`,
+      "sys",
+    );
+  const reception = socialReception(id),
+    chance = teamInvitationChance(id);
+  if (!reception.accepted || Math.random() * 100 >= chance) {
+    S.teamInvites = S.teamInvites || {};
+    S.teamInvites[id] = S.day + 3;
+    log(
+      `<b>${N[id][0]}:</b> “Ainda não posso aceitar. Quero ver como você trata a equipe quando a situação fica difícil.” (chance de aceite: ${Math.round(chance)}%)`,
+      "sys",
+    );
+    return render();
   }
+  S.team.push(id);
+  S.teamInvites = S.teamInvites || {};
+  S.teamInvites[id] = 0;
+  remember(id, "equipe", "Aceitou o convite para integrar sua equipe.", {
+    affinity: 2,
+    trust: 2,
+    respect: 1,
+  });
+  log(
+    `🤝 ${N[id][0]} aceitou entrar para sua equipe. A especialidade ${allyTestStat(id).toUpperCase()} ajuda nos testes e a confiança cresce em missões compartilhadas.`,
+    "ok",
+  );
   render();
 }
 
@@ -249,7 +370,187 @@ function expirePromises() {
   });
 }
 
+function clanFocusStat() {
+  return {
+    uchiha: "nin",
+    hyuga: "int",
+    senju: "tai",
+    uzumaki: "nin",
+  }[S.clan];
+}
+
+function gainClanRenown(rank) {
+  if (!S.clan || S.clan == "none") return;
+  const points = { D: 1, C: 2, B: 3, A: 4, S: 5 }[rank] || 1,
+    before = S.clanRenown || 0;
+  S.clanRenown = before + points;
+  const stat = clanFocusStat();
+  [10, 30, 60].forEach((threshold) => {
+    if (
+      before < threshold &&
+      S.clanRenown >= threshold &&
+      !S.clanMilestones?.[threshold]
+    ) {
+      S.clanMilestones = S.clanMilestones || {};
+      S.clanMilestones[threshold] = true;
+      if (stat) addStat(stat, 1);
+      log(
+        `🏯 Sua contribuição fortalece a linhagem ${CLANS[S.clan].name}. Renome ${threshold}: +1 ${stat?.toUpperCase() || "atributo"} e uma nova responsabilidade familiar.`,
+        "ok",
+      );
+    }
+  });
+}
+
+function organizationRequirementReason(id) {
+  const organization = ORGANIZATIONS[id],
+    requirement = organization.requirements,
+    reasons = [];
+  if (S.loc != organization.location)
+    reasons.push(`local: ${L[organization.location][1]}`);
+  if (S.rk < requirement.rank)
+    reasons.push(`rank ${RK[requirement.rank]} ou superior`);
+  if (S.done < requirement.missions)
+    reasons.push(`${requirement.missions} missões concluídas`);
+  if (
+    Number.isFinite(requirement.reputation) &&
+    (S.rep || 0) < requirement.reputation
+  )
+    reasons.push(`reputação ${requirement.reputation}+`);
+  if (
+    Number.isFinite(requirement.maxReputation) &&
+    (S.rep || 0) > requirement.maxReputation
+  )
+    reasons.push(`reputação até ${requirement.maxReputation}`);
+  if (S.car < requirement.charisma)
+    reasons.push(`carisma ${requirement.charisma}+`);
+  return reasons.length ? `Requisitos pendentes: ${reasons.join(" · ")}.` : "";
+}
+
+function startOrganizationApplication(id) {
+  const organization = ORGANIZATIONS[id];
+  if (!organization) return log("Essa organização não existe.", "sys");
+  if ((S.organizations || []).includes(id))
+    return log(`Você já pertence à ${organization.name}.`, "sys");
+  if ((S.organizations || []).length)
+    return log(
+      `Você já tem um vínculo com ${ORGANIZATIONS[S.organizations[0]].name}. Encerre-o antes de buscar outro.`,
+      "sys",
+    );
+  const reason = organizationRequirementReason(id);
+  if (reason) return log(`🔒 ${reason}`, "sys");
+  const application = S.organizationApplication;
+  if (application?.id == id && !application.failed) {
+    mode = "org";
+    render();
+    return;
+  }
+  if (application?.id == id && application.cooldownUntil > S.day)
+    return log(
+      `A organização pediu que você espere até o dia ${application.cooldownUntil} antes de tentar novamente.`,
+      "sys",
+    );
+  if (application && application.id != id && !application.failed)
+    return log(
+      `Conclua ou abandone primeiro o processo de seleção da ${ORGANIZATIONS[application.id].name}.`,
+      "sys",
+    );
+  S.organizationApplication = {
+    id,
+    step: 0,
+    successes: 0,
+    startedDay: S.day,
+    failed: false,
+    cooldownUntil: 0,
+  };
+  mode = "org";
+  log(
+    `📨 Você se apresenta à ${organization.name}. A seleção envolve três decisões; nenhuma reputação garante aprovação.`,
+    "bt",
+  );
+  render();
+}
+
+function cancelOrganizationApplication() {
+  if (S.organizationApplication?.failed)
+    return log("Não há uma seleção ativa para abandonar.", "sys");
+  S.organizationApplication = null;
+  log("Você encerrou o processo seletivo sem entrar na organização.", "sys");
+  save();
+  render();
+}
+
+function resolveOrganizationTrial(choiceIndex) {
+  const application = S.organizationApplication,
+    organization = ORGANIZATIONS[application?.id],
+    stage = organization?.tests[application?.step],
+    choice = stage?.[1][choiceIndex];
+  if (!application || !organization || !choice)
+    return log("Essa etapa da seleção não está mais disponível.", "sys");
+  const stat = choice[1],
+    roll = R(1, 20),
+    rankBonus = Math.min(3, Math.floor(S.rk || 0)),
+    difficulty = 14 + application.step * 2,
+    total = roll + (S[stat] || 0) + rankBonus;
+  log(
+    `🎭 ${choice[0]}: ${roll} + ${stat.toUpperCase()} ${S[stat] || 0} + experiência ${rankBonus} = ${total} (precisa de ${difficulty}).`,
+    "sys",
+  );
+  if (total >= difficulty) {
+    application.successes++;
+    log("A banca reconhece sua decisão e registra um acerto.", "ok");
+  } else log("A decisão não convence completamente a banca.", "bad");
+  application.step++;
+  if (application.step >= organization.tests.length) {
+    if (application.successes >= 2) {
+      S.organizations = [application.id];
+      S.organizationHistory = Array.isArray(S.organizationHistory)
+        ? S.organizationHistory
+        : [];
+      S.organizationHistory.push({
+        id: application.id,
+        joinedDay: S.day,
+        leftDay: null,
+      });
+      S.organizationApplication = null;
+      log(
+        `✅ <b>Você foi aceito(a) na ${organization.name}.</b> ${organization.perk} Sua filiação ficará registrada no seu histórico.`,
+        "ok",
+      );
+    } else {
+      application.failed = true;
+      application.step = 0;
+      application.successes = 0;
+      application.cooldownUntil = S.day + 5;
+      log(
+        `A ${organization.name} encerra a seleção sem uma oferta. Você poderá se candidatar novamente após o dia ${application.cooldownUntil}.`,
+        "sys",
+      );
+    }
+  }
+  save();
+  render();
+}
+
+function leaveOrganization() {
+  const id = S.organizations?.[0];
+  if (!id) return log("Você não pertence a uma organização.", "sys");
+  const record = [...(S.organizationHistory || [])]
+    .reverse()
+    .find((entry) => entry.id == id && entry.leftDay === null);
+  if (record) record.leftDay = S.day;
+  S.organizations = [];
+  log(
+    `Você encerrou seu vínculo com a ${ORGANIZATIONS[id].name}. Os feitos e as consequências dessa passagem continuam no histórico.`,
+    "sys",
+  );
+  save();
+  render();
+}
+
 const npc = (id) => {
+  if (!N[id] || ew().dead[id])
+    return log("Essa pessoa não está mais disponível para interagir.", "sys");
   T = id;
   mode = "npc";
   if (!S.rel[id]) S.rel[id] = 0;
@@ -434,12 +735,23 @@ const AC = {
 };
 
 function dn(a, x) {
+  if (!N[T] || ew().dead[T]) {
+    mode = "map";
+    return log("Essa pessoa não está mais disponível para interagir.", "sys");
+  }
+  if (["talk", "train", "duel", "adv"].includes(a) && rejectSocialContact(T))
+    return render();
   if (!AC[a](T, N[T], x)) render();
 }
 
 function say(prompt) {
+  if (!N[T] || ew().dead[T]) {
+    mode = "map";
+    return log("Essa pessoa não está mais disponível para conversar.", "sys");
+  }
   const t = (prompt || $("#fr").value || "").trim();
   if (!t) return;
+  if (rejectSocialContact(T)) return render();
   const n = N[T],
     l = t.toLowerCase();
   log(`<b>Você:</b> ${esc(t)}`);
@@ -509,7 +821,41 @@ function chatReply(id, text) {
   const t = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   let topic = "geral",
     replies;
-  if (/\b(idade|anos|velho|velha|aniversario)\b/.test(t)) {
+  if (/\b(anbu|akatsuki|organizacao|organizacoes|faccoes?)\b/.test(t)) {
+    topic = "organizacoes";
+    const member = S.organizations?.[0];
+    replies = member
+      ? [
+          `Você escolheu se vincular à ${ORGANIZATIONS[member].name}. Uma filiação abre algumas portas, mas também traz deveres e consequências.`,
+          `A ${ORGANIZATIONS[member].name} espera que você responda pelas decisões que toma em nome dela.`,
+        ]
+      : id == "tsunade"
+        ? [
+            "A ANBU seleciona shinobi com disciplina e histórico confiável. Não é um atalho para ganhar prestígio.",
+            "Há uma seleção reservada na Torre. Reputação ajuda, mas a equipe precisa saber que você toma decisões por conta própria.",
+          ]
+        : id == "obito" || id == "itachi"
+          ? [
+              "A Akatsuki não é uma vila nem uma família. Quem se aproxima precisa entender o preço antes de aceitar qualquer ordem.",
+              "Ouvi versões diferentes sobre os objetivos da Akatsuki. Nem todos os seus membros contam a mesma história.",
+            ]
+          : [
+              "Dizem que a ANBU procura gente discreta; outros juram que o recrutamento depende mais de confiança do que de força.",
+              "Os rumores sobre a Akatsuki se contradizem. Uma coisa parece certa: entrar não significa poder sair sem consequências.",
+            ];
+  } else if (/\b(cla|linhagem|familia)\b/.test(t)) {
+    topic = "linhagem";
+    replies =
+      S.clan == "none"
+        ? [
+            "Uma família pode oferecer raízes, mas não decide quem você vai se tornar.",
+            "O legado também pode ser feito por quem escolhemos proteger.",
+          ]
+        : [
+            `Você carrega a linhagem ${CLANS[S.clan].name}. O renome ${S.clanRenown || 0} mostra o que suas missões acrescentaram à história da família.`,
+            `${CLANS[S.clan].tradition} Seu caminho ainda depende das escolhas que fizer.`,
+          ];
+  } else if (/\b(idade|anos|velho|velha|aniversario)\b/.test(t)) {
     topic = "idade";
     replies = [
       `Hoje tenho ${ageOf(id)} anos. E você, como está se sentindo com o passar do tempo?`,
