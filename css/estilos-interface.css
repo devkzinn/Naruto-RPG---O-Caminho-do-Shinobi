@@ -23,6 +23,16 @@
   color: #fff;
   font-weight: 700;
 }
+.mission-board-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+.mission-board-tabs .b {
+  align-items: center;
+  text-align: center;
+}
 .urgent-shade {
   position: fixed;
   inset: 0;
