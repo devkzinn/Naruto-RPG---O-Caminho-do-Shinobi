@@ -110,6 +110,7 @@ const fresh = (n, a, el) => ({
   kit: 1,
   pill: 1,
   got: {},
+  missionHistory: [],
   cd: {},
   duels: {},
   pres: {},
@@ -341,6 +342,15 @@ function cont() {
   S.specialItems = Array.isArray(S.specialItems)
     ? S.specialItems.filter((id) =>
         Object.prototype.hasOwnProperty.call(SPECIAL_ITEMS, id),
+      )
+    : [];
+  S.missionHistory = Array.isArray(S.missionHistory)
+    ? S.missionHistory.filter(
+        (entry) =>
+          entry &&
+          typeof entry.id == "string" &&
+          typeof entry.title == "string" &&
+          typeof entry.day == "number",
       )
     : [];
   S.equipped = Object.assign(
