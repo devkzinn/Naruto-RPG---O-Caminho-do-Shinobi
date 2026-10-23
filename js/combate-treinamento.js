@@ -1119,6 +1119,17 @@ function identityTestBonus(stat, mission) {
     bonus += 2 + (S.lv >= 8 ? 1 : 0);
   if (clan == "senju" && kind == "protect") bonus += 2 + (S.lv >= 8 ? 1 : 0);
   if (clan == "uzumaki" && stat == "nin") bonus += 1 + (S.lv >= 8 ? 1 : 0);
+  const clanRenownBonus = Math.min(2, Math.floor((S.clanRenown || 0) / 25));
+  if (
+    clanRenownBonus &&
+    ((clan == "uchiha" && stat == "nin" && (!mission || kind == "combat")) ||
+      (clan == "hyuga" &&
+        ["investigation", "rescue"].includes(kind) &&
+        ["int", "vel"].includes(stat)) ||
+      (clan == "senju" && kind == "protect") ||
+      (clan == "uzumaki" && stat == "nin"))
+  )
+    bonus += clanRenownBonus;
   if (spec == "ninjutsu" && stat == "nin") bonus += 2 + (S.lv >= 8 ? 1 : 0);
   if (spec == "taijutsu" && stat == "tai") bonus += 2 + (S.lv >= 8 ? 1 : 0);
   if (
@@ -1135,6 +1146,18 @@ function identityTestBonus(stat, mission) {
     stat == "int"
   )
     bonus += 2 + (S.lv >= 8 ? 1 : 0);
+  if (
+    (S.organizations || []).includes("anbu") &&
+    ["stealth", "investigation"].includes(kind) &&
+    ["int", "vel"].includes(stat)
+  )
+    bonus++;
+  if (
+    (S.organizations || []).includes("akatsuki") &&
+    ["combat", "survival"].includes(kind) &&
+    ["nin", "tai"].includes(stat)
+  )
+    bonus++;
   return bonus;
 }
 
