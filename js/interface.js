@@ -1,5 +1,7 @@
 /* Interface: telas, menus, mapa e renderização. */
 
+let missionBoardTab = "available";
+
 function missionOperationMeters(contract) {
   if (contract.style == "stealth")
     return bar("🕵️ Suspeita", contract.suspicion, 100, "hp");
@@ -41,18 +43,22 @@ function campaignBoard() {
         open = storyArcOpen(index),
         destination = arc.missions[stage]?.loc,
         label = done
-          ? "Arco concluído · consequência registrada"
+          ? ""
           : open
             ? `Continuar · etapa ${stage + 1}/${arc.missions.length}: ${arc.missions[stage].title}${destination ? ` · 📍 ${L[destination][1]}` : ""}`
             : storyLockReason(index);
+      if (done) return "";
       return btn(
         `${arc.title}<small>${arc.summary}</small><small>${label}</small>`,
-        open && !done
+        open
           ? `startStoryMission('${arc.id}')`
-          : `log('${done ? "Este arco já foi concluído." : `🔒 ${label}`}','sys')`,
-        open && !done ? "p" : "lock",
+          : `log('🔒 ${label}','sys')`,
+        open ? "p" : "lock",
       );
-    }).join("") +
+    }).filter(Boolean).join("") +
+    (STORY_ARCS.some((arc) => !story.completed[arc.id])
+      ? ""
+      : '<small>Todos os arcos disponíveis foram concluídos. Consulte o histórico na aba “Concluídas”.</small>') +
     "</div>" +
     ((S.specialItems || []).length
       ? `<h4>✨ Itens especiais</h4><div class="world">${S.specialItems
@@ -64,6 +70,42 @@ function campaignBoard() {
           .join("<hr>")}</div>`
       : "")
   );
+}
+
+function completedMissionBoard() {
+  const story = storyState(),
+    completedArcs = STORY_ARCS.filter((arc) => story.completed[arc.id]),
+    history = (S.missionHistory || []).slice().sort((a, b) => b.day - a.day),
+    olderCompletions = Math.max(0, (S.done || 0) - history.length);
+  return `<h3>✅ Missões concluídas</h3><small style="color:var(--mu)">Seu histórico de contratos e etapas narrativas concluídas.</small>${
+    olderCompletions
+      ? `<div class="world"><b>📚 Progresso anterior</b><br><small>${olderCompletions} missão(ões) concluída(s) antes do histórico detalhado ser adicionado ao jogo. O total do save foi preservado; os títulos dessas missões não estavam registrados.</small></div>`
+      : ""
+  }${
+    completedArcs.length
+      ? `<h4>Arcos concluídos</h4><div class="g">${completedArcs
+          .map(
+            (arc) =>
+              `<div class="world"><b>${esc(arc.title)}</b><br><small>${esc(story.consequences[arc.id]?.summary || arc.consequence)}</small></div>`,
+          )
+          .join("")}</div>`
+      : ""
+  }${
+    history.length
+      ? `<h4>Histórico de missões · ${history.length}</h4><div class="g">${history
+          .map((entry) => {
+            const source = entry.storyTitle
+              ? entry.storyTitle
+              : entry.contractIndex !== null
+                ? "Contrato semanal"
+                : entry.operationId
+                  ? "Designação ou ocorrência"
+                  : "Missão";
+            return `<div class="world"><b>${rkb(entry.rank || "D")}${esc(entry.title)}</b><br><small>Dia ${entry.day} · ${esc(source)}</small>${entry.description ? `<br><small>${esc(entry.description)}</small>` : ""}</div>`;
+          })
+          .join("")}</div>`
+      : '<div class="world">Nenhuma missão foi concluída ainda. As próximas conclusões aparecerão aqui.</div>'
+  }`;
 }
 
 function vAssignment() {
@@ -547,9 +589,18 @@ const MTYPE = {
 const vBoard = () => {
   const story = storyState(),
     wk = Math.floor(S.day / 4),
+    completedContracts = new Set(
+      (S.missionHistory || [])
+        .filter(
+          (entry) =>
+            Number.isInteger(entry.contractIndex) && entry.week == wk,
+        )
+        .map((entry) => entry.contractIndex),
+    ),
     lst = MS.map((m, i) => ({ m, i })).filter(
       ({ m, i }) =>
         !story.defeatedBosses[m[3]] &&
+        !completedContracts.has(i) &&
         hs("q", i, wk) < (i < MS0 ? 0.8 : 0.6) &&
         (m[0] != "S" || S.rep >= REP_REQ.S) &&
         (m[0] != "A" || S.rk >= 2) &&
@@ -565,11 +616,16 @@ const vBoard = () => {
   const aviso = ocupado
     ? `<div class="world alert"><b>📜 Você já tem uma atividade em andamento.</b><br><small>Conclua ou retome antes de aceitar outro contrato.</small><div class="row">${S.activeContract ? btn("Retomar operação", "resumeMultiDayMission()", "p") : S.assignment?.status == "active" ? btn("Retomar designação", "mode='assignment';render()", "p") : ""}</div></div>`
     : "";
+  const tabs = `<div class="mission-board-tabs" role="tablist" aria-label="Seções do mural de missões"><button class="b ${missionBoardTab == "available" ? "p" : ""}" role="tab" aria-selected="${missionBoardTab == "available"}" onclick="missionBoardTab='available';render()">📜 Disponíveis</button><button class="b ${missionBoardTab == "completed" ? "p" : ""}" role="tab" aria-selected="${missionBoardTab == "completed"}" onclick="missionBoardTab='completed';render()">✅ Concluídas<small>${(S.missionHistory || []).length + STORY_ARCS.filter((arc) => story.completed[arc.id]).length} registro(s)</small></button></div>`;
+  if (missionBoardTab == "completed")
+    return aviso + tabs + completedMissionBoard() + back;
   return (
     aviso +
+    tabs +
     campaignBoard() +
     '<h3>📜 Mural de missões</h3><small style="color:var(--mu)">Rank D leva 1 etapa estratégica; os ranks seguintes aumentam a duração até 4 etapas no rank S. Cada categoria tem desafios próprios antes da etapa final. Reputação elevada libera contratos B, A e S.</small><div class="g" style="margin-top:8px">' +
-    lst
+    (lst.length
+      ? lst
       .sort((a, b) => MSK.indexOf(a.m[0]) - MSK.indexOf(b.m[0]))
       .map(({ m, i }) => {
         const r = m[0],
@@ -594,7 +650,8 @@ const vBoard = () => {
           ok && !ocupado ? "" : "lock",
         );
       })
-      .join("") +
+      .join("")
+      : '<div class="world">Nenhum contrato novo disponível neste ciclo. Consulte “Concluídas” ou volte quando o mural for atualizado.</div>') +
     back +
     "</div>"
   );
