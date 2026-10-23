@@ -1484,7 +1484,19 @@ function repGain(rank, urg) {
 function missionBonuses(mission, progress = {}) {
   const title = mission.title || mission[1] || "",
     description = mission.description || mission[2] || "",
-    goal = mission.goal || mission[6] || "";
+    goal = mission.goal || mission[6] || "",
+    storyRun = progress.story,
+    contractIndex = Number.isInteger(progress.i) && progress.i >= 0
+      ? progress.i
+      : null,
+    week = Math.floor(S.day / 4),
+    archiveId = storyRun
+      ? `story:${storyRun.arcId}:${storyRun.stageIndex}`
+      : contractIndex !== null
+        ? `contract:${contractIndex}:${week}`
+        : progress.id
+          ? `operation:${progress.id}:${S.day}`
+          : `mission:${S.day}:${title}`;
   const context = `${title} ${description}`
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -1508,6 +1520,12 @@ function missionBonuses(mission, progress = {}) {
       progress.civiliansProtected ?? (noSetbacks && civilianRisk ? 1 : 0),
     title,
     description,
+    archiveId,
+    contractIndex,
+    week,
+    storyArcId: storyRun?.arcId || "",
+    storyStageIndex: storyRun?.stageIndex ?? -1,
+    operationId: progress.id || "",
     civilianRisk,
     rescue,
     failures: progress.failures || 0,
@@ -1529,6 +1547,29 @@ function completeMission(rank, reward, xp, urgent, bonuses = {}) {
   S.ryo += reward + bonusRyo;
   gain(xp + bonusXp);
   S.done++;
+  S.missionHistory = Array.isArray(S.missionHistory)
+    ? S.missionHistory
+    : [];
+  if (
+    bonuses.title &&
+    !S.missionHistory.some((entry) => entry.id == bonuses.archiveId)
+  ) {
+    const arc = bonuses.storyArcId
+      ? STORY_ARCS.find((item) => item.id == bonuses.storyArcId)
+      : null;
+    S.missionHistory.push({
+      id: bonuses.archiveId || `mission:${S.day}:${bonuses.title}`,
+      title: bonuses.title,
+      description: bonuses.description || "",
+      rank,
+      day: S.day,
+      contractIndex: bonuses.contractIndex ?? null,
+      week: bonuses.week ?? null,
+      storyArcId: bonuses.storyArcId || "",
+      storyTitle: arc?.title || "",
+      operationId: bonuses.operationId || "",
+    });
+  }
   repGain(rank, urgent);
   const repBonus = secondary * 0.25 + allies * 0.5 + civilians * 0.5;
   if (repBonus)
@@ -1597,6 +1638,12 @@ function smis(i) {
   const story = storyState(),
     week = Math.floor(S.day / 4),
     available = hs("q", i, week) < (i < MS0 ? 0.8 : 0.6);
+  if (
+    (S.missionHistory || []).some(
+      (entry) => entry.contractIndex == i && entry.week == week,
+    )
+  )
+    return log("Este contrato já foi concluído neste ciclo do mural.", "sys");
   if (story.defeatedBosses[mission[3]] || !available)
     return log("Este contrato não está disponível no mural hoje.", "sys");
   if (S.hp <= Math.ceil(S.mh * 0.2))
