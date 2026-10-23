@@ -752,6 +752,33 @@ function chatReply(id, text) {
   return chatPick(id, topic, replies);
 }
 
+const FREE_TEXT_EXAMPLES = [
+  ["Treinar", "treinar"],
+  ["Meditar", "meditar"],
+  ["Dormir e descansar", "dormir"],
+  ["Comer ramen", "comer ramen"],
+  ["Pescar", "pescar"],
+  ["Explorar os arredores", "explorar"],
+  ["Contar uma piada", "contar uma piada"],
+];
+
+function runFreeTextExample(index) {
+  const example = FREE_TEXT_EXAMPLES[index],
+    input = $("#fr");
+  if (!example || !input) return;
+  input.value = example[1];
+  fr();
+}
+
+function talkToNearbyExample(index) {
+  const nearby = pres(S.loc),
+    id = nearby[index],
+    input = $("#fr");
+  if (!id || !input) return;
+  input.value = `conversar com ${N[id][0]}`;
+  fr();
+}
+
 function fr() {
   const t = ($("#fr").value || "").trim();
   if (!t) return;
